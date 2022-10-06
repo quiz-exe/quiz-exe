@@ -1,0 +1,35 @@
+var bc_type = 'clip';
+
+
+$(document).ready(function(e){
+
+	if(typeof clipObj=='object' && clipObj.dasid.length){
+		var _player=new schoolplayer(clipObj,"#moviePlayer>.inner");
+		_player.init(function(_videoObj,_type){
+		
+			if(_type=='hls'){
+				if(typeof rangeControl == "object"){
+					rangeControl.init(_videoObj,clipObj);		
+				};
+				$('#video-controller').removeClass('none')
+
+			}else if(_type=='swf'){
+				var videoiframe=document.getElementById('school-frameplayer');
+				videoiframe.contentWindow.start_nPlayer();
+			};
+			//iframe用の親postmessage
+			if($('body').hasClass('movieModal')){
+				postParent('clip');
+				setResizeParent(function(){
+					postParent('clip')
+				});
+			}
+
+		});
+	}else{
+		$('#schoolPlayer').addClass('no-media').find('#player .help').html('この動画は現在配信されていません')
+	}
+
+
+
+});

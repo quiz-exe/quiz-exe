@@ -1,0 +1,1566 @@
+(function(){
+	var link = document.createElement('link');
+	link.rel = 'icon';
+	link.href = '/school/favicon.png';
+	var head = document.querySelector('head');
+	head.appendChild(link);
+
+	var link32=document.createElement('link');
+	link32.rel = 'icon';
+	link32.sizes="32x32";
+	link32.href = '/school/favicon32.png';
+	head.appendChild(link32);
+})();
+
+(function(){
+	var script = document.createElement('script');
+	script.setAttribute('type', 'application/ld+json');
+	function _try_return(f){
+		try{return f.call();}catch(e){}
+	};
+
+	/* setting */
+	var name = undefined || _try_return(function(){return document.title;});
+	var uri = undefined || _try_return(function(){return document.querySelector('[property="og:url"]').getAttribute("content");});
+	var image = undefined || _try_return(function(){return document.querySelector('[property="og:image"]').getAttribute("content");});
+	var description = undefined || _try_return(function(){return document.querySelector('[name="description"]').getAttribute("content");});
+	var keywords = undefined || _try_return(function(){return document.querySelector('[name="keywords"]').getAttribute("content");});
+
+	var website_obj = {
+		"@context": "http://schema.org",
+		"@type": "WebSite",
+	};
+	if(name) website_obj["name"] = name; 
+	if(uri) website_obj["url"] = uri; 
+	if(description) website_obj["description"] = description; 
+
+	website_obj["publisher"]={
+		"@type": "Organization",
+		"name": "NHK (Japan Broadcasting Corporation)",
+		"url": "https://www.nhk.or.jp/",
+		"logo": "https://www.nhk.or.jp/nhk-600x600.png"
+	};
+	var path = window.location.pathname;
+	if(path == '/school/'){
+		website_obj["url"]='https://www.nhk.or.jp/school/'
+		website_obj["potentialAction"]={
+			"@type": "SearchAction",
+			"target": "https://www.nhk.or.jp/school/keyword/?kw={search_term_string}",
+			"query-input": "required name=search_term_string"
+		};
+	};
+
+	var website_obj2 = {
+		"@context": "http://schema.org",
+		"@type": "Organization",
+		"name": "NHK (Japan Broadcasting Corporation)",
+		"url": "https://www.nhk.or.jp/",
+		"logo": "https://www.nhk.or.jp/nhk-600x600.png"
+	};
+
+	var website_obj3 = {
+		"@context": "http://schema.org",
+		"@type": "VideoObject",
+		"name": name,
+		"description":description,
+		"thumbnailUrl": image
+	};
+
+
+	var website_ary=[website_obj,website_obj2];
+	if(path == "/school/movie/bangumi.cgi" || path == "/school/movie/clip.cgi"){
+		var dur=_getNormalizeDur();
+		var uploadDate='';
+		if(typeof r_upload=='string'){
+			uploadDate=r_upload;
+		};
+		if(dur){
+			website_obj3["duration"]=dur;
+			website_obj3["uploadDate"]=uploadDate;
+			website_ary.push(website_obj3);
+		};
+		
+	};
+	script.innerText = JSON.stringify(website_ary);
+	document.head.appendChild(script);
+
+	function _getNormalizeDur(){
+		var d=false;
+		if(typeof r_duration =='string'){
+			var dur=r_duration;
+			var durAry=dur.split(':')
+			var dt=new Date();
+			dt.setHours(parseInt(durAry[0],10));
+			dt.setMinutes(parseInt(durAry[1],10));
+
+			dt.setSeconds(parseInt(durAry[2],10));
+
+			var ms=Math.round(('0.'+durAry[3]) *1);
+			if(ms){
+				dt.setSeconds(dt.getSeconds()+1);
+			};
+			var h= dt.getHours() >0 ? (dt.getHours()+'H') : '';
+
+			d='PT'+h+''+(dt.getMinutes()+'M')+''+(dt.getSeconds()+'S');
+		};
+		return d;
+	};
+
+})();
+
+
+var sc_wDir=schoolConfig.wdir;
+
+var glNav = {
+
+	teacherMenu:[
+		{'name':'学習指導要領から探す','url':sc_wDir+'guideline/','teacher':true,'class':''},
+		{'name':'教科書から探す','url':sc_wDir+'textbook/','teacher':true,'class':''},
+		{'name':'動画クリップセレクション 理科編','url':sc_wDir+'selection/','teacher':true,'class':''},
+		{'name':'動画クリップセレクション 社会編','url':sc_wDir+'selection/?syakai','teacher':true,'class':''},
+		{'name':'まなブー！コンシェルジュ','url':sc_wDir+'concierge/','teacher':true,'class':''},
+		{'name':'NHK for School 実践データべース','url':sc_wDir+'data/','teacher':true,'class':''},
+		{'name':'すくレポ','url':sc_wDir+'aw/','teacher':true,'class':''},
+		{'name':'2022 番組 & WEBガイド','url':sc_wDir+'guidebook/','teacher':true,'class':''},
+		{'name':'GIGAスクールでもっと活用！NHK for School','url':sc_wDir+'giga/','teacher':true,'class':''},
+		{'name':'GIGAサポ 考える授業やるキット','url':sc_wDir+'yarukit/','teacher':true,'class':''}
+
+	],
+	teacherSearchMenu:[
+		{'name':'学習指導要領から探す','url':sc_wDir+'guideline/'},
+		{'name':'教科書から探す','url':sc_wDir+'textbook/'},
+		{'name':'GIGAサポ 考える授業やるキット','url':sc_wDir+'yarukit/'}
+	],
+	helpMenu:[
+		{'name':'番組表（PDF）','url':sc_wDir+'first/pdf/nfs2022_timetable.pdf','teacher':false,'class':'ext'},
+		{'name':'NHK for School アプリ','url':sc_wDir+'app/','teacher':false,'class':''},
+		{'name':'NHKキッズ アプリ','url':sc_wDir+'kids/','teacher':false,'class':''},
+		{'name':'導入ガイド','url':sc_wDir+'first/','teacher':true,'class':''},
+		{'name':'よくある質問','url':sc_wDir+'help/','teacher':false,'class':''},
+		{'name':'サイトマップ','url':sc_wDir+'sitemap/','teacher':false,'class':''},
+		{'name':'NHK for School API','url':'https://school-api-portal.nhk.or.jp/','teacher':false,'class':'ext'}
+
+
+	],
+	specialMenu:[
+		{'name':'ものすごい図鑑','url':sc_wDir+'zukan/','teacher':false,'class':''},
+		{'name':'りかまっぷ','url':sc_wDir+'rikamap/','teacher':false,'class':''},
+		{'name':'ワイワイプログラミング','url':sc_wDir+'programming/','teacher':false,'class':''},
+		{'name':'出川哲朗のクイズほぉ〜スクール','url':sc_wDir+'quiz/','teacher':false,'class':''},
+		{'name':'戦争について考えてみよう','url':sc_wDir+'sensou/','teacher':false,'class':''},
+		{'name':'世界を応援しよう！','url':sc_wDir+'cheer/','teacher':false,'class':''},
+		{'name':'ハナシティ','url':'https://www.nhk.or.jp/ijimezero/','teacher':false,'class':'ext'},
+		{'name':'#あちこちのすずさん','url':sc_wDir+'suzusan/','teacher':false,'class':''},
+		{'name':'アニ×パラ～あなたのヒーローは誰ですか～','url':sc_wDir+'anipara/','teacher':false,'class':'ext'},
+		{'name':'特別展「植物 地球を支える仲間たち」 × NHK for School','url':sc_wDir+'plants/','teacher':false,'class':'ext'},
+		{'name':'いろとりどり','url':'https://www.nhk.or.jp/irotoridori/','teacher':false,'class':'ext'},
+		{'name':'ものすごい図鑑　文化財編','url':sc_wDir+'bunkazai/','teacher':false,'class':''}
+
+	],
+	menusearch:{
+		'subject':[
+			{'name':'理科','data':'rika','class':'rika'},
+			{'name':'社会','data':'syakai','class':'syakai'},
+			{'name':'国語','data':'kokugo','class':'kokugo'},
+			{'name':'算数・数学','data':'sansuu','class':'sansuu'},
+			{'name':'生活','data':'seikatsu','class':'seikatsu'},
+			{'name':'道徳','data':'doutoku','class':'doutoku'},
+			{'name':'音楽','data':'ongaku','class':'ongaku'},
+			{'name':'体育','data':'taiiku','class':'taiiku'},
+			{'name':'図工','data':'zukou','class':'zukou'},
+			{'name':'技術','data':'gijutsu','class':'gijutsu'},
+			{'name':'家庭','data':'katei','class':'katei'},
+			{'name':'総合','data':'sougou','class':'sougou'},
+			{'name':'英語','data':'eigo','class':'eigo'},
+			{'name':'特活','data':'tokkatsu','class':'tokkatsu'},
+			{'name':'特支','data':'tokushi','class':'tokushi'},
+			{'name':'その他','data':'other','class':'other'}
+		],
+		'grade':[
+			{'name':'幼保','data':'g0','class':'junior0'},
+			{'name':'小1','data':'g1','class':'junior1'},
+			{'name':'小2','data':'g2','class':'junior2'},
+			{'name':'小3','data':'g3','class':'junior3'},
+			{'name':'小4','data':'g4','class':'junior4'},
+			{'name':'小5','data':'g5','class':'junior5'},
+			{'name':'小6','data':'g6','class':'junior6'},
+			{'name':'中・高','data':'g7','class':'middle_high'}
+		]
+	}
+};
+	glNav.menuContent = [
+		{'name':'ばんぐみ<ruby><rb>一覧</rb><rt>いちらん</rt></ruby>','url':sc_wDir+'program/','class':'i1 fixedview ruby','teacher':false,'footerBlock':0,'footerReplaceFlag':''},
+		{'name':'プレイリスト','url':sc_wDir+'playlist/','class':'i7','teacher':false,'footerBlock':1,'footerReplaceFlag':''},
+		{'name':'おうちで学ぼう！','url':sc_wDir+'ouchi/','class':'i2','teacher':false,'footerBlock':1,'footerReplaceFlag':''},
+		{'name':'先生向け','url':'#teacherMenu','class':'menuOpen forTeacher fixedview','teacher':true,'footerBlock':0,'footerReplaceFlag':glNav.teacherSearchMenu,itemname:'teacher'},
+		{'name':'学びをひろげよう','url':'#specialMenu','class':'menuOpen','teacher':false,'footerBlock':2,'footerReplaceFlag':glNav.specialMenu,itemname:'special'},
+		{'name':'ヘルプ','url':'#helpMenu','class':'menuOpen','teacher':false,'footerBlock':3,'footerReplaceFlag':glNav.helpMenu,itemname:'help'},
+		{'name':'リンク集','url':sc_wDir+'link/','class':'','teacher':false,'footerBlock':4,'footerReplaceFlag':''}
+
+	];
+
+var scHeader={
+	init:function(){
+		(function(){
+			var hSrc='<div class="mainHeader">'
+
+			hSrc+='<div class="inner">'
+			hSrc+='    <h1><a href="'+sc_wDir+'"><img src="/school/common/img/logo_header.gif" alt="NHK for School" class="normal"><img src="/school/common/img/logo_header_s.svg" alt="NHK for School" class="square"></a></h1>'
+			hSrc+='    <div class="modeBtn"><div class="modeHd">先生向け</div><ul id="selectMode"><li class="teacherMode">ON</li><li class="schoolMode">OFF</li></ul><div class="helpbtn"><a href="#teacherHelp"><span class="icon"><img src="/school/common/img/icon_head_help_w.svg" alt=""></span><span>先生向けとは</span></a></div><div id="teacherHelp"><div class="close"><img src="/school/common/img/bt_close_w.svg" alt="閉じる"></div><p>先生向けを「ON」にすると 先生向けコンテンツが 表示されるようになります。</p><figure><img src="/school/common/img/teacher_help.png" alt="先生向けコンテンツは このマークが目印です。"></figure></div><div class="spToggle">&nbsp;</div></div>'
+			hSrc+='    <div class="searchBtn"><a href="#menusearch">検索</a></div>'
+			hSrc+='    <div class="wrapMenu">'
+			hSrc+='        <ul class="menu">'
+			// hSrc+='            <li class=""><span>&nbsp;</span></li>'
+			hSrc+='        </ul>'
+			hSrc+='    </div>'
+			hSrc+='</div>'
+			hSrc+='<div class="dropMenuMore"><div id="hiddenMore"><div class="inner"><ul class="menu"></ul></div></div></div>'
+			hSrc+='<div class="dropMenu"></div>'
+			hSrc+='<div class="dropMenuSP"><div class="inner"><ul class="menu"></ul></div></div>'
+			hSrc+='</div>'
+			
+			$('#schoolHeader').html(hSrc);
+			var parent=$('#schoolHeader').find('.wrapMenu>.menu')
+			var parentSP=$('#schoolHeader').find('.dropMenuSP .menu')
+			var parentMore=$('#schoolHeader').find('.dropMenuMore .menu')
+
+			for(var i=0;i<glNav.menuContent.length;i++){
+				var item=glNav.menuContent[i]
+				var list=$('<li class="'+item.class+'"><a href="'+item.url+'"><span>'+item.name+'</span></a></li>');
+				if(list.hasClass('ruby')){
+					$('#schoolHeader').find('.wrapMenu').addClass('ruby')
+				}
+				parent.append(list);
+				var spLi=list.clone()
+				if(item.class.indexOf('menuOpen')!=-1){
+					
+					spLi.append('<ul />').attr('data-itemname',item.itemname)
+				}
+				if(item.teacher){
+					parentSP.prepend(spLi)
+
+				}else{
+					parentSP.append(spLi)
+
+				}
+				if(i>=1 && !item.teacher){
+					parentMore.append(list.clone())
+				}
+			};
+			parent.append('<li class="showMore fixedview" ><a href="#hiddenMore"><span class="onlyPC txt">もっと見る</span><span class="icon onlySP"></span><span class="icon onlySP"></span><span class="icon onlySP"></span></a></li>')
+		})();
+		
+
+		//検索メニュー生成
+		(function(){
+			var menusrc='';
+			menusrc+='<div id="menusearch" class="hiddenMenu menusearch">'
+			menusrc+='    <div class="inner">'
+			menusrc+='        <div id="commonSearch" class="commonSearch">'
+			menusrc+='            <div class="keywordArea">'
+			menusrc+='                <input type="text" id="searchKeyword" data-placeholdertext="キーワードを入れてね" placeholder="キーワードを入れてね">'
+			menusrc+='                <div class="placeHolder">&nbsp;</div>'
+			menusrc+='            </div>'
+			menusrc+='            <div class="optionArea">'
+			menusrc+='                <ul class="optionMenu">'
+			menusrc+='                    <li class="subject">'
+			menusrc+='                        <strong class="selected"><span>教科</span></strong>'
+			menusrc+='                        <ul class="toggleMenu"><li class="subject_all" data-param="all">すべて</li></ul>'
+			menusrc+='                    </li>'
+			menusrc+='                <li class="grade">'
+			menusrc+='                    <strong class="selected"><span>学年</span></strong>'
+			menusrc+='                    <ul class="toggleMenu"><li class="grade_all" data-param="all">すべて</li></ul>'
+			menusrc+='                </li>'
+			menusrc+='                </ul>'
+			menusrc+='                <input id="searchProgram" class="searchChechbox" type="checkbox" value="b" checked="checked">'
+			menusrc+='                <label for="searchProgram">ばんぐみ</label>'
+			menusrc+='                <input id="serachClip" class="searchChechbox" type="checkbox" value="c" checked="checked"> <label for="serachClip">クリップ</label>'
+			menusrc+='            </div>'
+			menusrc+='            <input type="submit" name="searchSubmit" class="searchSubmit" id="searchSubmit" value="">'
+			menusrc+='        </div>'
+			menusrc+='        <div class="forTeacher teachersSearch">'
+			menusrc+='            <ul></ul>'
+			menusrc+='        </div>'
+			menusrc+='    </div>'
+			menusrc+='</div>';
+	
+			$('#schoolHeader').find('.dropMenu').append(menusrc);
+			var parent=$('#schoolHeader').find('.subject .toggleMenu')
+			for(var i=0;i<glNav.menusearch.subject.length;i++){
+				var item=glNav.menusearch.subject[i]
+				var list=$('<li class="'+item.class+'" data-param="'+item.data+'">'+item.name+'</li>');
+				parent.append(list)
+			};
+			var parentgrade=$('#schoolHeader').find('.grade .toggleMenu')
+			for(var j=0;j<glNav.menusearch.grade.length;j++){
+				var item=glNav.menusearch.grade[j]
+				var list=$('<li class="'+item.class+'" data-param="'+item.data+'">'+item.name+'</li>');
+				parentgrade.append(list)
+			}
+			var parenttc=$('#schoolHeader').find('.teachersSearch>ul')
+			for(var k=0;k<glNav.teacherSearchMenu.length;k++){
+				var item=glNav.teacherSearchMenu[k]
+				var list=$('<li><a href="'+item.url+'">'+item.name+'</a></li>');
+				parenttc.append(list)
+			}
+		})();
+
+		
+		//先生メニュー生成
+		(function(){
+			var teachermenu=''
+			teachermenu+='<div id="teacherMenu" class="hiddenMenu" >'
+			teachermenu+='    <div class="inner">'
+			teachermenu+='        <div class="menuHd">先生向け</div>'
+			teachermenu+='        <ul class="menuItem"></ul>'
+			teachermenu+='    </div>'
+			teachermenu+='</div>'
+	
+			$('#schoolHeader').find('.dropMenu').append(teachermenu);
+			var parent=$('#schoolHeader').find('#teacherMenu .menuItem');
+			var parentSP=$('#schoolHeader').find('.dropMenuSP .menu>.forTeacher>ul')
+
+			for(var i=0;i<glNav.teacherMenu.length;i++){
+				var item=glNav.teacherMenu[i]
+				var list=$('<li class="'+item.class+'"><a href="'+item.url+'">'+item.name+'</a></li>');
+				if(item.teacher){
+					list.addClass('forTeacher')
+				}
+				parent.append(list)
+				parentSP.append(list.clone())
+			};
+
+		})();
+
+		//ヘルプメニュー生成
+		(function(){
+			var helpmenu='<div id="helpMenu" class="hiddenMenu">';
+			helpmenu+='<div class="inner">'
+			helpmenu+='<div class="menuHd">ヘルプ</div>'
+			helpmenu+='<ul class="menuItem">'
+			helpmenu+='</ul></div></div>'
+			$('#schoolHeader').find('.dropMenu').append(helpmenu);
+	
+
+			var parent=$('#schoolHeader').find('#helpMenu .menuItem')
+			var parentSP=$('#schoolHeader').find('.dropMenuSP').find('[data-itemname="help"]>ul')
+
+			for(var i=0;i<glNav.helpMenu.length;i++){
+				var item=glNav.helpMenu[i]
+				var list=$('<li class="'+item.class+'"><a href="'+item.url+'">'+item.name+'</a></li>');
+				if(item.teacher){
+					list.addClass('forTeacher')
+				}
+				parent.append(list)
+				parentSP.append(list.clone())
+			};
+
+		})();
+
+		//学びをひろげようメニュー生成
+		(function(){
+			var specialmenu='<div id="specialMenu" class="hiddenMenu">';
+			specialmenu+='<div class="inner">'
+			specialmenu+='<div class="menuHd">学びをひろげよう</div>'
+			specialmenu+='<ul class="menuItem">'
+			specialmenu+='</ul></div></div>'
+			$('#schoolHeader').find('.dropMenu').append(specialmenu);
+			var parent=$('#schoolHeader').find('#specialMenu .menuItem');
+			var parentSP=$('#schoolHeader').find('.dropMenuSP').find('[data-itemname="special"]>ul')
+
+			for(var i=0;i<glNav.specialMenu.length;i++){
+				var item=glNav.specialMenu[i]
+				var list=$('<li class="'+item.class+'"><a href="'+item.url+'">'+item.name+'</a></li>');
+				if(item.teacher){
+					list.addClass('forTeacher')
+				}
+				parent.append(list)
+				parentSP.append(list.clone())
+			};
+		})();
+
+		this.setMenuEvent();
+		this.setSearchEvent();
+		this.setScrollEvent();
+
+	},
+	setSearchEvent:function(){
+		//検索メニュー
+		$('#schoolHeader .searchBtn a').on('click', function(e){
+			e.preventDefault();
+			var _this = $(this);
+			$('.hiddenMenu').not(_this.attr('href')).slideUp(200);
+			//$('.active').not(_this).removeClass('active');
+			_this.toggleClass('active');
+			$(_this.attr('href')).slideToggle();
+			var spmenu=$('#schoolHeader').find('.dropMenuSP');
+			//spでメニューが開いている
+			if(spmenu.hasClass('open')){
+				spmenu.find('.menu').slideUp(function(){
+					spmenu.removeClass('open')
+					$('.modeBtn').removeClass('open')
+				});
+				$('.wrapMenu').find('.showMore>a').removeClass('active')
+			};
+			//spで先生メニューが開いている
+			if(spmenu.hasClass('otherHide')){
+				$('.spToggle').trigger('click')
+			}
+			$('#hiddenMore').slideUp(200);
+			$('.showMore>a').removeClass('open')
+		});
+
+		//エリア外のクリック
+		var dropSc=$('#menusearch')
+		$(document).off('click.menusearch').on('click.menusearch',function(e) {
+			//検索メニュー、検索アイコン、先生切り替え以外のエリア
+			if(!$(e.target).closest(dropSc).length && !$(e.target).closest('.searchBtn a').length && !$(e.target).closest('#selectMode').length) {
+				dropSc.slideUp(200);
+			};
+		});
+
+		$('.commonSearch .optionMenu .selected').on('click', function(){
+			var _this = $(this);
+			if(!_this.hasClass('active')){
+				$('.toggleMenu').slideUp(150);
+				$('strong.selected').removeClass('active');
+				_this.addClass('active');
+				$(_this.next('.toggleMenu')).slideDown();
+			}else{
+				$('.toggleMenu').slideUp();
+				_this.removeClass('active');
+			};
+		});
+
+		$('.commonSearch .optionMenu .toggleMenu li').on('click', function(){
+			var _this = $(this);
+			_this.siblings('.active').removeClass('active');
+			_this.addClass('active');
+			_this.parents('li').find('.selected').attr({'data-param':_this.attr('data-param'),'class':'selected '+ _this.attr('data-param')}).find('span').text(_this.text());
+			_this.parent('.toggleMenu').slideUp();
+		});
+
+		
+		// 検索
+		$("#searchKeyword,#searchKeyword2").on("keypress", function (e) {
+			var kw = $(this).val();
+			if(e.which === 13){
+				_startSearch(kw,e)
+			};
+		});
+		$('#searchSubmit,#searchSubmit2').on('click',function(e){
+			var kw = $(e.target).parents('.commonSearch').find('.keywordArea input').val();
+			_startSearch(kw,e)
+		});
+
+		function _startSearch(kw,e){
+			kw=kw.replace(/\&/g,'＆');
+			var param=_getParam(e)
+			try {
+				_tc_onClick( s_omni,{prop56:kw,eVar56:kw},'keyword');
+			}
+			catch (e) {
+			
+			};
+			var kwSt='';
+			if(kw){
+				kwSt = 'kw='+encodeURI(kw);
+			}
+			location.href = sc_wDir+'keyword/?' + kwSt + param;
+		};
+		
+		function _getParam(e){
+			var sc=$(e.target).parents('.commonSearch')
+			var kyoka=sc.find('.subject .selected').data('param');
+			if(!kyoka){
+				kyoka='all'
+			}
+			var grade=sc.find('.grade .selected').data('param')
+			if(!grade){
+				grade='all'
+			}
+			var cat=''
+			sc.find('.searchChechbox:checked').each(function(){
+				cat+=$(this).val()
+			});
+			if(cat.length==0 || cat.length==2){
+				cat='all'
+			}
+		
+			return '&kyoka='+kyoka+'&grade='+grade+'&cat='+cat
+		};
+	},
+	setMenuEvent:function(){
+		$('#selectMode').on('click',function(){
+			if(!$('body').hasClass('teacherMode')){
+				$('body').addClass('teacherMode');
+				_shv.teacherMode = true;
+				document.cookie = "nol_school__mode=teacher;domain=nhk.or.jp;Secure;path=/school/;max-age=31536000";
+				if(!_shv.spLayout){
+					$(window).trigger('greed');
+				}
+				if(typeof teacherModeChange=='function'){
+					teacherModeChange(true);
+				};
+			}else{
+				$('body').removeClass('teacherMode');
+				_shv.teacherMode = false;
+				document.cookie = "nol_school__mode=;domain=nhk.or.jp;Secure;path=/school/;max-age=31536000";
+				if(!_shv.spLayout){
+					$(window).trigger('greed');
+				}
+				if(typeof teacherModeChange=='function'){
+					teacherModeChange(false);
+				};
+			}
+		});
+		//先生向け説明
+		var helpTm=null
+		var helpbtn=$('#schoolHeader').find('.helpbtn>a');
+		var helpmsg= $('#teacherHelp');
+		helpbtn.on('click',function(){
+			helpmsg.slideToggle();
+			 clearTimeout(helpTm)
+				helpTm=null;
+			 if(helpmsg.is(':visible')){
+				helpTm=setTimeout(function(){
+					clearTimeout(helpTm)
+					helpTm=null;
+					helpmsg.slideUp();
+				},5000)
+			 }
+			 return false
+		});
+		$(document).off('click.help').on('click.help',function(e) {
+			if(!$(e.target).closest(helpbtn).length) {
+				helpmsg.slideUp();
+				clearTimeout(helpTm);
+				helpTm=null
+				
+			}else{
+
+			};
+		});
+
+
+		var moreBtn=$('#schoolHeader').find('.showMore>a');
+		var searchBtn=$('#schoolHeader').find('.searchBtn>a');
+
+		moreBtn.on('click',function(){
+			var id=$(this).attr('href');
+			$(this).toggleClass('active')
+
+			$(id).slideToggle()
+			if(searchBtn.hasClass('active')){
+				$('#menusearch').slideUp(200);
+				searchBtn.removeClass('active');
+			};
+			helpmsg.slideUp(200);
+			var txt='もっと見る'
+			if(moreBtn.hasClass('active')){
+				txt='とじる'
+			}
+			moreBtn.find('.txt').html(txt)
+		});
+
+	
+		//エリア外のクリック
+		var dropMore=$('#hiddenMore')
+		$(document).off('click.dropmore').on('click.dropmore',function(e) {
+			if($('body').hasClass('PC')){
+				if(!$(e.target).closest(dropMore).length && !$(e.target).closest('#selectMode').length) {
+					dropMore.slideUp(200);
+					
+					moreBtn.removeClass('active').find('.txt').html('もっと見る');
+
+					
+				};
+			}
+		});
+
+		//下層メニュー展開中flag
+		//var isDropMore=false;
+		//表示delay
+		//var moreTm=null;
+		//hover
+		// $('#schoolHeader').find('.showMore>a').hover(
+		// 	function(){
+		// 		if($('body').hasClass('SP')){
+		// 			return false;
+		// 		}
+		// 		var id=$(this).attr('href');
+		// 		if(!moreTm){
+		// 			moreTm=setTimeout(function(){
+		// 				clearTimeout(moreTm);
+		// 				moreTm=null
+		// 				$(id).slideDown()
+		// 				$('#menusearch').slideUp()
+		// 				$('.searchBtn>a').removeClass('active')
+		// 			},100);
+		// 		};
+		// 	},
+		// 	function(){
+		// 		clearTimeout(moreTm);
+		// 		moreTm=null;
+
+		// 		var id=$(this).attr('href');
+		// 		var enter=false;
+		// 		//menu領域enter判定delay
+		// 		var wait=setTimeout(function(){
+		// 			clearTimeout(wait);
+		// 			if(!enter){
+		// 				$(id).slideUp();
+		// 			};
+		// 			return false;
+		// 		},200);
+		// 		$(id).off('mouseenter').on('mouseenter',function(){
+		// 			//clearTimeout(wait)
+		// 			enter=true;
+		// 			isDropMore=true;
+		// 		});
+		// 		$(id).off('mouseleave').on('mouseleave',function(){
+		// 			enter=false;
+		// 			var wait=setTimeout(function(){
+		// 				clearTimeout(wait)
+		// 				if(!isDropMore){
+		// 					$(id).slideUp();
+		// 				}
+		// 			},200);
+		// 		});
+		// 	}
+		// );
+
+		//PC用hover
+		var menuTm=null
+		var openMenu=$('#schoolHeader').find('.wrapMenu .menuOpen>a,.dropMenuMore .menuOpen>a');
+		openMenu.hover(
+			function(e){
+				var id=$(this).attr('href');
+				if(!menuTm){
+					menuTm=setTimeout(function(){
+						clearTimeout(menuTm);
+						menuTm=null
+						isDropMore=true
+						$(id).slideDown().addClass('view');
+						$('#menusearch').slideUp(200);
+						searchBtn.removeClass('active')
+						//先生向けではもっとみる非表示
+						if(id=='#teacherMenu'){
+							$('#hiddenMore').slideUp(200);
+							moreBtn.removeClass('active').find('.txt').html('もっと見る');
+
+						}
+					},100);
+				};
+			},
+			function(){
+
+				clearTimeout(menuTm);
+				menuTm=null;
+
+				var id=$(this).attr('href');
+				var enter=false
+				//isDropMore=false
+
+				var wait=setTimeout(function(){
+					clearTimeout(wait)
+					if(!enter){
+						isDropMore=false
+						$(id).slideUp(200).removeClass('view');
+					}
+				},100);
+
+				$(id).off('mouseenter').on('mouseenter',function(){
+					isDropMore=true;
+					clearTimeout(wait)
+					enter=true
+				});
+				$(id).off('mouseleave').on('mouseleave',function(){
+					isDropMore=false
+					$(id).slideUp(200).removeClass('view');
+
+				});
+			}
+		);
+		
+			//tab click
+		openMenu.on('click',function(){
+			var id=$(this).attr('href');
+			if($(id).is(':visible')){
+				$(id).slideUp()
+				searchBtn.removeClass('active')
+			}
+			return false;
+		});
+
+		//sp  teacher内toglle
+		$('#schoolHeader').find('.modeBtn .spToggle').on('click',function(){
+			$(this).toggleClass('active')
+			var spmenu=$('#schoolHeader').find('.dropMenuSP');
+			var ul=spmenu.find('.menu>.forTeacher>ul')
+			//spmenu.toggleClass('otherHide')
+			if(spmenu.hasClass('open')){
+				ul.slideToggle();
+			}else{
+				if($(this).hasClass('active')){
+					spmenu.addClass('otherHide');
+					ul.slideDown()
+				}else{
+					ul.slideUp(function(){
+						spmenu.removeClass('otherHide');
+
+					})
+				}
+			}
+			$('#teacherHelp').slideUp();
+			return false
+		});
+
+		//SPメニュー
+		moreBtn.on('click',function(){
+			
+			var spmenu=$('#schoolHeader').find('.dropMenuSP');
+			//spmenu.find('.menu').slideToggle();
+			spmenu.removeClass('otherHide')
+			var modebtn=$('#schoolHeader').find('.modeBtn')
+			if($(this).hasClass('active')){
+				spmenu.addClass('open')
+				modebtn.addClass('open')
+				spmenu.find('.menu').slideDown()
+
+			}else{
+				spmenu.find('.menu').slideUp(function(){
+					spmenu.removeClass('open')
+					modebtn.removeClass('open')
+
+				})
+				var toggle=modebtn.find('.spToggle');
+				if(toggle.hasClass('active')){
+					toggle.trigger('click').removeClass('active')
+				}
+
+			}
+
+
+			//tab
+			// if($('#hiddenMore').is(':visible')){
+			// 	$('#hiddenMore').slideUp();
+			// 	$('.searchBtn>a').removeClass('active')
+			// }
+			return false
+		});
+
+		//spメニュー内
+		$('#schoolHeader').find('.dropMenuSP .menuOpen>a').on('click',function(){
+			$(this).siblings('ul').slideToggle();
+			return false
+		});
+
+
+		//cookie
+		var cookieValue = document.cookie.replace(/(?:(?:^|.*;\s*)nol_school__mode\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+		
+		$(window).on('pageshow', function(event) {
+			//safariキャッシュ対応
+			if (event.originalEvent.persisted) {
+				cookieValue = document.cookie.replace(/(?:(?:^|.*;\s*)nol_school__mode\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+				if(cookieValue == 'teacher'){
+					_teacherView();
+				};
+
+			};
+		});
+
+		if(cookieValue == 'teacher'){
+			_teacherView();
+		};
+
+		function _teacherView(){
+			_shv.teacherMode = true;
+			document.cookie = "nol_school__mode=teacher;domain=nhk.or.jp;path=/school/;Secure;max-age=31536000";
+			if(!_shv.spLayout){
+				$(window).trigger('greed');
+			}
+			if(typeof teacherModeChange=='function'){
+				teacherModeChange(true);
+			};
+			$('body').addClass('teacherMode');
+		};
+
+		return;
+
+	
+		$('#schoolHeader .modeHd a').on('click', function(e){
+			var _this = $(this);
+			var tgt=$(_this.attr('href'));
+			//表示、非表示動作中は何もしない（連打対策）
+			if(tgt.css('overflow') =='hidden'){
+				return false
+			};
+			e.preventDefault();
+			tgt.slideToggle();
+		});
+		var search = $('#searchKeyword')
+		search.on('keydown keyup keypress change',function(){
+			var $this = $(this);
+			placeHolder($this);
+		});
+
+		function placeHolder($this){
+			var _$this = $this;
+			if(_$this.val().length > 0){
+				search.addClass('focus');
+			}else{
+				search.removeClass('focus');
+			}
+		}
+
+	
+	},
+	setScrollEvent:function(){
+		$(window).on('scroll', function(e){
+			if($('body').hasClass('SP')){
+				return
+			}
+			var _this = $(this),
+			_height = $('#schoolHeader').outerHeight();
+			if(_this.scrollTop() >= _height ){
+				$('body').addClass('fixedLine');
+			}else {
+				$('body').removeClass('fixedLine');
+				$('#schoolHeader').find('.dropMenuMore>.inner').hide();
+				
+				$('#hiddenMore').hide();
+				$('#schoolHeader').find('.showMore>a').removeClass('active').find('.txt').html('もっと見る');
+
+			}
+		});
+	}
+}
+var _shv = {
+	teacherMode : false,
+	spLayout:false
+}
+
+var scFooter={
+	init:function(){
+		var current = 0;
+		var html = $('<div class="inner" />');
+		$('#schoolFooter').append(html);
+
+		$.each(glNav.menuContent,function(index,elem){
+			var setUL=$('<ul class="footerBlock" />')
+			//console.log(elem.name,elem.footerBlock)
+			var parent=html.find('.footerBlock').eq(elem.footerBlock);
+			if(parent.length){
+				setUL=parent;
+			}else{
+				html.append(setUL);
+			};
+			if(elem.footerReplaceFlag.length){
+				var li='<li class="'+elem.class+'"><span>'+elem.name+'</span>';
+				var sub=_getsubUl(elem.footerReplaceFlag);
+				li+=sub+'</li>';
+				setUL.append(li);
+
+			}else{
+				setUL.append('<li class="'+elem.class+'"><a href="'+elem.url+'">'+elem.name+'</a></li>');
+			};
+		});
+
+
+		//
+		function _getsubUl(_elem){
+			var src='<ul>'
+			$.each(_elem,function(index,elem){
+				var li='<li>'
+				if(elem.teacher){
+					li='<li class="forTeacher">'
+				}
+				var anc='a class="subLink"';
+				if(elem.class){
+					anc='a class="subLink '+elem.class+'"';
+					if(elem.class=='ext'){
+						anc+=' target="_blank"'
+					};
+				};
+				anc+=' href="'+elem.url+'"'
+				anc ='<'+anc+'>'+elem.name+'</a>'
+				li+=anc+'</li>'
+				src+=li
+			});
+			src+='</ul>'
+			return src;
+		};
+
+	}
+};
+
+
+//radioクリックでの背景変更,SPでのselect生成
+var g_radioSerect=function(){
+	var ul=$('nav>.narrow');
+	
+	if(ul.length){
+
+		var radio=ul.find('input[type="radio"]')
+		// radio.on('click',function(){
+		// 	$(this).parent('li').addClass('active').siblings('li').removeClass('active')
+		// });
+
+		//selecttitleがあったもののみSP用のselect生成
+		var selecttitle = ul.data('selecttitle')
+		if(selecttitle){
+			var selectWrap=$('<div class="selectWrap onlySP" />').html('<span>'+ul.data('selecttitle')+'</span>');
+			var select=$('<select class="narrow" />')
+			radio.each(function(){
+				var label= $(this).attr('data-origin') ? $(this).attr('data-origin') : $(this).siblings('label').html() ;
+				var opt=$('<option value="'+$(this).val()+'" data-origin="'+$(this).attr('data-origin')+'">'+label+'</option>');
+				select.append(opt)
+			});
+			ul.after(selectWrap.append(select));
+		};
+	};
+};
+
+var g_slider_slick={
+	init:function(parent,opt,moreOpt){
+		var sliderElem=parent;
+
+		var slidesToPc = 4;
+		var slidesToSp = 2;
+		if(opt && opt.pcView){
+			slidesToPc=opt.pcView
+		}
+		if(opt && opt.spView){
+			slidesToSp=opt.spView
+		}
+		var spSetting={
+			slidesToShow: slidesToSp,
+			slidesToScroll: slidesToSp,
+			draggable:true,
+			centerMode:false,
+			initialSlide:0
+		};
+		if(slidesToSp == 'none'){
+			spSetting='unslick';
+		}
+		//console.log(spSetting)
+		var slickOption={
+			autoplay:false,
+			autoplaySpeed:3000,
+			infinite: false,
+			accessibility:false,
+			//lazyLoad:'progressive',
+			dots:false,
+			fade:false,
+			draggable:false,
+			prevArrow:'<div class="slider-navi prev"><img src="/school/common/img/bt_slider_prev.svg"></div>',
+			nextArrow:'<div class="slider-navi next"><img src="/school/common/img/bt_slider_next.svg"></div>',
+			adaptiveHeight:false,
+			slidesToScroll:slidesToPc,
+			slidesToShow:slidesToPc,
+			responsive: [
+				{
+				breakpoint: 768,
+					settings: spSetting
+				}
+			]
+		};
+		if(typeof moreOpt=='object'){
+			for(var p in moreOpt){
+				slickOption[p]=moreOpt[p]
+			}
+		}
+
+		// sliderElem.on('init',function(){
+
+		// });
+		// sliderElem.on('afterChange',function(){
+			
+		// });
+
+		var slickElem=sliderElem.slick(slickOption);
+
+		if(spSetting=='unslick'){
+			var RESIZE_EVENT='resize.slick orientationchange.slick'
+			$(window).off(RESIZE_EVENT).on(RESIZE_EVENT, function() {
+				sliderElem.slick('resize');
+			  });
+		}
+
+	}
+}
+var g_isJp=nol_isJP();
+var g_school_util={
+	getQueryObj:function(){
+		var r=false;
+		var _q=window.location.search;
+		if(_q){
+			_q=_q.substr(1,_q.length);
+			_q=_q.split('&');
+			r={};
+			for(var i=0;i<_q.length;i++){
+				r[_q[i].split('=')[0]]=_q[i].split('=')[1];
+			};
+		}
+		return r;
+	}
+	,getItemKyoka:function(itemObj){
+	
+		var CGI_DIR=schoolConfig.cdir;
+		var _dasid = itemObj.dasId ? itemObj.dasId : itemObj.dasid;
+		itemObj.dasid=_dasid;
+		var kyokaClass= itemObj.kyokaName ? itemObj.kyoka : 'other';
+		if(kyokaClass=='youho'){
+			kyokaClass='other'
+		}
+		var item=$('<div class="itemKyouka" />').addClass(kyokaClass);
+		item.attr({'data-gakunen':itemObj.gakunen});
+
+		var movieLink= itemObj.bangumi ? (sc_wDir+itemObj.kyoka+'/'+itemObj.bangumi+'/') : '#';
+
+		if(itemObj.cat && itemObj.cat=='c'){
+			movieLink=CGI_DIR+g_movieLink.CLIP_CGI+'?das_id='+_dasid+'&p=box'
+		}
+		if(itemObj.link){
+			movieLink=itemObj.link;
+		}
+		var src='<a href="'+movieLink+'" data-dasid="'+_dasid+'" data-limit="'+itemObj.limit+'">';
+
+			src+='<div class="thumb">'
+			var imgsrc=''
+			if(_dasid){
+				imgsrc=g_school_util.getDasImgSrc(itemObj)
+			}
+			if(itemObj.imgSrc){
+				imgsrc=itemObj.imgSrc
+			}
+			src+='<img src="'+imgsrc+'">'
+			var dur=''
+			if(itemObj.duration){
+				var dAry=itemObj.duration.split(':');
+				var hh=dAry[0].length==1 ? '0'+ dAry[0] : dAry[0];
+				var mm=dAry[1].length==1 ? '0'+ dAry[1] : dAry[1];
+				dur=hh+':'+mm;
+			}
+			src+='<div class="time">'+dur+'</div>'
+			if(itemObj.cat){
+				var cat= itemObj.cat=='b'? 'ばんぐみ':'クリップ';
+				src+='<div class="cat '+itemObj.cat+'">'+cat+'</div>'
+			};
+			src+='</div>'
+
+			src+='<div class="detail">'
+				src+='<div class="kyouka">'
+				if(itemObj.kyokaName){
+					var kName=itemObj.kyokaName;
+					if(kName=='算数'){
+						kName='算数・数学'
+					}
+					src+='<span class="icon">'+kName+'</span>'
+				}else{
+					src+='<span class="icon">その他</span>'
+				}
+				if(itemObj.gakunen){
+					src+='<span class="grade">'+itemObj.gakunen+'</span>'
+				}else{
+					src+='<span class="grade">　</span>'
+				}
+				src+='</div>'
+				var title=itemObj.title.replace(/\\n/g,'');
+				var subtitle=itemObj.subTitle;
+				if(typeof subtitle =='string'){
+					subtitle=subtitle.replace(/\\n/g,'');
+				}
+				if(subtitle.length){
+					src+='<div class="pgTitle">'+title+'</div>'
+					src+='<div class="title">'+itemObj.subTitle+'</div>'
+				}else{
+					src+='<div class="title">'+title+'</div>'
+				}
+				
+			src+='</div>'
+			src+='</a>'
+			item.html(src);
+
+			return item;
+		
+	}
+	,getDasImgSrc:function(dasOpt){
+		
+		var dasid=dasOpt.dasid;
+		if(dasid.length<1){
+			return '/school/common/img/default.png'
+		}
+		var src = '//www.nhk.or.jp/das/image/';
+		src+= dasid.substr(0, 8)+'/'+dasid+'_';
+		var slot= dasOpt.slot ? dasOpt.slot:'S_005';
+		src+= slot+'.jpg'
+		if(dasOpt.limit && dasOpt.limit==1){
+			src=src.replace('/das/image/','/das/r/image/');
+			if(!g_isJp){
+				//国外アクセス時のサムネイル指定
+				src='/school/player/img/im_rlimit.png'
+			}
+		}
+		return src
+	},
+	getDasInfo:function(dasAry,cb){
+		var u=schoolConfig.cdir+'api4/app/movie_list.cgi';
+		var reqAry=[];
+		var MAX=50;
+		for(var i=0;i<dasAry.length;i++){
+			var num=Math.floor(i/MAX);
+			var spl=','
+			if(!reqAry[num]){
+				reqAry[num]={
+					data:{'das_id':''},
+					url: u,
+					type: 'get',
+					dataType: 'json'
+				};
+				spl=''
+			}
+		
+			reqAry[num]['data']['das_id']+=spl+dasAry[i]
+		};
+
+		var jqXHRList = [];
+		for (var j= 0; j < reqAry.length; j++) {
+			jqXHRList.push($.ajax(reqAry[j]));
+		};
+		$.when.apply($, jqXHRList).done(function () {
+			var allresult={
+				response:{
+					info:{result:0},
+					records:[]
+				}
+			};
+
+			//リクエストが一回と複数でargumentsが異なる。
+			if(reqAry.length>1){
+				for (var i = 0; i < arguments.length; i++) {
+					var result = arguments[i];
+					var res=result[0].response;
+					allresult.response.info.result+=parseInt(res.info.result,10);
+					var resAry=res.records;
+					for(var k=0;k<resAry.length;k++){
+						allresult.response.records.push(resAry[k])
+					}
+				}
+			}else{
+				allresult=arguments[0];
+			}
+			cb(allresult)
+			
+		
+		}).fail(function (ex) {
+			cb(false)
+		});
+	}
+	
+};
+
+var g_movieLink={
+	BANGUMI_CGI:'movie/bangumi.cgi',
+	CLIP_CGI:'movie/clip.cgi',
+	timer:null,
+	mfpConf:{
+		type: 'iframe',
+		width: '100%',height: '100%',
+		mainClass: 'mfp-fade',
+		removalDelay: 200,
+		preloader: false,
+		fixedContentPos: false,
+		closeBtnInside:true,
+		fixedContentPos:true,
+		closeOnBgClick:false,
+		closeMarkup: '<div class="mfp-close"><img src="/school/common/img/bt_modalclose.svg" alt=""></div>',
+		callbacks: {
+			open: function() {
+				var loading=$('<div id="frame-loading"><div class="loader"><div class="ball-beat"><div></div><div></div><div></div></div></div></div>')
+				 var content=$('.mfp-fade.mfp-wrap .mfp-content').append(loading)
+				 var module=g_movieLink;
+
+				 if(content.length && !module.timer){
+					module.timer=setInterval(function(){
+						//popupが完全に出るまでは背景でcloseさせない（ダブルクリックでclose回避）
+						if(content.css('top')=='0px' ){
+							var bg=$('.mfp-wrap')
+							bg.on('click.bg',function(){
+								bg.off('click.bg');
+								$.magnificPopup.close();
+								return false;
+							})
+						}
+					},100);
+					var movieFrame=content.find('iframe');
+					if(movieFrame.length){
+						var frameURL=movieFrame.attr('src');
+						module.setState(frameURL);
+					};
+				 };
+
+				
+				var frameparent=$('.mfp-iframe-scaler');
+				var frame=frameparent.find('iframe');
+				if(frame.length){
+					
+					$(window).off('message.iframe').on('message.iframe',function(e){
+						 //高さ取得用のpostmessage
+						var h=e.originalEvent.data.height ? e.originalEvent.data.height :'100%';
+						//if(!$('.mfp-content').hasClass('movie_fullscreen')){
+							frame.height(h);
+							frameparent.height(h).addClass('show');
+							frame.data('openHeight',h)
+						//}
+						loading.remove();
+						 //fake fullscreen移行
+						var full=e.originalEvent.data.fullscreen ;
+						if(full){
+							if(full=='enter'){
+								//親ページのmfp-content
+								$('.mfp-content').addClass('movie_fullscreen')
+								$('body').addClass('modal_fullscreen')
+							}else{
+								$('.mfp-content').removeClass('movie_fullscreen');
+								$('body').removeClass('modal_fullscreen')
+								if(frame.data('openHeight')){
+									frame.height(frame.data('openHeight'));
+								}
+
+							}
+						}
+
+					});
+
+				document.addEventListener('touchmove', module.disableScroll, { passive: false });
+
+				};
+			}
+			,beforeClose: function() {
+				var module=g_movieLink;
+				clearInterval(module.timer);
+				module.timer=null
+				$('.mfp-iframe-scaler').removeClass('show');
+				document.removeEventListener('touchmove', module.disableScroll);
+
+			}
+			
+		}
+	},
+	init:function(_type){
+		var _this=this
+		_this.setNormalLink()
+	}
+	//リンク設定のみ（）
+	,setLink:function(parent,_type,_cb){
+		var _this=this
+
+		var CGI_DIR=schoolConfig.cdir;
+		var anc=parent.find('a[data-dasid]')
+		anc.each(function(){
+			var $this=$(this)
+			var _dasid=$this.data('dasid');
+			var reg=/D[0-9]{10}_[0-9]{5}/;
+			if(_dasid && reg.test(_dasid)){
+				var cat = parseInt(_dasid.substr(4,2),10)>=53 ? 'clip':'bangumi';
+				var boxparam='';
+				if(cat=='clip'){
+					boxparam='&p=general'
+					var clipbox=_type.clipbox;
+					if(clipbox){
+						boxparam='&p=box'
+					}else{
+
+					}
+					$this.attr({'href':CGI_DIR+_this.CLIP_CGI+'?das_id='+_dasid+boxparam})
+				}else{
+					var bangumibox=_type.bangumibox;
+					if(bangumibox){
+						boxparam='&p=box'
+					}
+					$this.attr({'href':CGI_DIR+_this.BANGUMI_CGI+'?das_id='+_dasid+boxparam})
+				};
+			}else{
+				return true;
+			}
+		
+		});
+		if(typeof _cb=='function'){
+			_cb();
+		}
+	}
+	,setNormalLink:function(){
+		var _this=this
+		var CGI_DIR=schoolConfig.cdir;
+		var anc=$('a[data-dasid]')
+		anc.each(function(){
+			var $this=$(this)
+			var _dasid=$this.data('dasid');
+			var reg=/D[0-9]{10}_[0-9]{5}/;
+			if(_dasid && reg.test(_dasid)){
+				var cat = parseInt(_dasid.substr(4,2),10)>=53 ? 'clip':'bangumi';
+				if(cat=='clip'){
+					$this.attr({'href':CGI_DIR+_this.CLIP_CGI+'?das_id='+_dasid+'&p=box','data-popup':'true'})
+				}else{
+					$this.attr({'href':CGI_DIR+_this.BANGUMI_CGI+'?das_id='+_dasid})
+				};
+			}else{
+				return true;
+			}
+		})
+		var popanc=$('a[data-popup="true"]');
+		if(popanc.length){
+			popanc.magnificPopup(_this.mfpConf);
+		}
+
+	}
+	,setPopLink:function(){
+		var _this=this
+		var CGI_DIR=schoolConfig.cdir;
+
+		$('.itemKyouka').each(function(){
+			var anc=$(this).find('a').not('.cbtn');
+			var _dasid=anc.data('dasid');
+			var reg=/D[0-9]{10}_[0-9]{5}/;
+			if(_dasid && reg.test(_dasid)){
+				var cat = parseInt(_dasid.substr(4,2),10)>=53 ? 'clip':'bangumi';
+				if(cat=='clip'){
+					anc.attr({'href':CGI_DIR+_this.CLIP_CGI+'?das_id='+_dasid+'&p=box','data-popup':'true'})
+				}else{
+					anc.attr({'href':CGI_DIR+_this.BANGUMI_CGI+'?das_id='+_dasid+'&p=box','data-popup':'true'})
+				};
+			}else{
+				return true;
+			}
+		})
+		var popanc=$('.itemKyouka').find('a[data-popup="true"]');
+		popanc.magnificPopup(_this.mfpConf);
+
+	},
+	//itemKyoukaに依存しないpopup
+	setAncPopLink:function(elem){
+		var _this=this
+		var CGI_DIR=schoolConfig.cdir;
+		elem.find('a').each(function(){
+			var anc=$(this)
+			var _dasid=anc.data('dasid');
+			if(_dasid){
+				var reg=/D[0-9]{10}_[0-9]{5}/;
+				if(_dasid && reg.test(_dasid)){
+					var cat = parseInt(_dasid.substr(4,2),10)>=53 ? 'clip':'bangumi';
+					if(cat=='clip'){
+						anc.attr({'href':CGI_DIR+_this.CLIP_CGI+'?das_id='+_dasid+'&p=box','data-popup':'true'})
+					}else{
+						anc.attr({'href':CGI_DIR+_this.BANGUMI_CGI+'?das_id='+_dasid});
+						//anc.attr({'href':CGI_DIR+_this.BANGUMI_CGI+'?das_id='+_dasid+'&p=box','data-popup':'true'})
+						
+					};
+				}else{
+					return true;
+				}
+			}
+		});
+		var popanc=elem.find('a[data-popup="true"]');
+		if(popanc.length){
+			popanc.magnificPopup(_this.mfpConf);
+		};
+	},
+	//あらすじリンク用　上記poplinkよりも後で呼び出す
+	setOnairLink:function(elem,dir){
+		//ヘッダーから放送リストページの有無確認
+		var onairLink=false,isHeader=false;
+		
+		if($('#programHeader').length){
+			isHeader=true;
+			
+			var tm=setInterval(function(){
+				var li=$('#programHeader').find('li');
+				if(li.length){
+					clearInterval(tm);
+					_setLink()
+				}
+			},300);
+		};
+
+		function _setLink(){
+			$('#programHeader').find('li').each(function(){
+				var href=$(this).find('a').attr('href')
+				//放送リストページあり
+				if(href.indexOf(dir+'onair/')!=-1){
+					onairLink=true;
+				};
+			});
+
+			elem.find('a').each(function(){
+				var anc=$(this)
+				if(anc.data('part')){
+					var host=schoolConfig.wdir.replace('/school/','')
+					var u=host+dir+'onair/#'+anc.data('part');
+					anc.attr({'href':u});
+					//放送リストページなしのため、リンクなし
+					if(isHeader && !onairLink){
+						var src=anc.html()
+						anc.replaceWith('<span>'+src+'</span>');	
+					}
+				}
+			});
+		}
+	},
+	setViewCompLink:function(){
+		var _this=this
+		_this.setNormalLink()
+
+	},
+	setState:function(frameURL){
+		if( window.history && window.history.pushState ){
+			// var q=window.location.search;
+			// var loc=window.location.href;
+			// loc=q.length ? loc+'&' : loc+'?'
+			// loc+='modal=true';
+			// console.log(q,loc)
+			// frameURL =frameURL.substr(0,4)!='http' ? 'https:'+frameURL : frameURL
+			//  console.log(frameURL)
+			history.pushState('modal', window.location.title, '');
+			$(window).on('popstate.modal', function(e){
+				//console.log(e.originalEvent.state);
+			//   if(e.originalEvent.state){
+			// 	history.replaceState(null,null,null)
+			//   };
+				$.magnificPopup.close();
+				$(window).off('popstate.modal');
+			});
+		  }
+	},
+	disableScroll:function(e){
+		e.preventDefault();
+		//console.log('disableScroll')
+	}
+};
+
+//cookie
+window.cookie_func = {
+	set:function(key, val, opt){
+		var t='';
+		t+= key+'=';
+		t+= encodeURIComponent(val)+';';
+		if(val==''){opt.expires=-365;}
+		if(opt.expires){t+='expires='+this.get_gmt(opt.expires)+';';}
+		if(opt.domain){t+='domain='+opt.domain+';';}
+		if(opt.path){t+='path='+opt.path+';';}else{t+='path=/;';}
+		if(opt.secure){t+='secure';}
+		document.cookie=t;
+	}
+	,get:function(key){
+		var t=document.cookie.split(';');
+		var u;
+		for(var i=0;i<t.length;i++){
+			u=t[i].split('=');
+			if(this.trim(u[0])==key){
+				if(u.length==2){
+					return decodeURIComponent(this.trim(u[1]));
+				}
+				else if(u.length==1){
+					this.del(key);
+					return '';
+				}
+			}
+		}
+		return '';
+	}
+	,del:function(key){
+		this.set(key, '', {expires:-365});
+	}
+	,get_gmt:function(d){
+		var exp=new Date();
+		exp.setTime(exp.getTime()+1000*60*60*24*d);
+		return exp.toGMTString();
+	}
+	,trim:function(s){
+		return s.replace(/^\s+|\s+$/g, '');
+	}
+	,check:function(){
+		//return navigator.cookieEnabled;
+		var chk='checkstring';
+		var ck='cookiecheck';
+		this.set(ck,chk,{});
+		if( this.get(ck) === chk ){
+			this.del(ck);
+			return true;
+		}
+		return false;
+	}
+};
+
+function setSNS(parent){
+	parent.html('<div class="nhk-snsbtn" data-nhksns-iconsize="s" data-nhksns-disable="google line"></div>');
+	var snsUrl = "https://www2.nhk.or.jp"+location.pathname+location.search;
+	var specialTitle = document.title;
+	NHKSNS.initSNS({"title":specialTitle,"description":"","url":snsUrl});
+
+};
+
+function g_pageTop(){
+	var topBtn=$('<div id="schoolPageTop" class="bottom"><div class="inner"><a href="#"><img src="/school/common/img/bt_pagetop_over.svg" alt="" class="over"><img src="/school/common/img/bt_pagetop.svg" alt="トップへ" class="normal"></a></div></div>');
+	var footer=$('#schoolFooter')
+	if(footer.length){
+		footer.after(topBtn)
+		topBtn.find('a').on('click',function(){
+			$('body, html').animate({ scrollTop: 0 }, 300);
+			return false;
+		});
+
+		$(window).on('scroll.pagetop', function(e){
+			var _this = $(this);
+			var toplimit = 200;
+			var bottomlimit = (footer.offset().top+footer.height())-$(window).innerHeight();
+			if(_this.scrollTop() >= toplimit){
+				
+				if(_this.scrollTop()>=bottomlimit){
+					topBtn.removeClass('fixed').addClass('bottom');
+				}else{
+					topBtn.removeClass('bottom').addClass('fixed');
+				}
+				
+			}else{
+				topBtn.removeClass('fixed');
+
+			}
+		});
+	}
+	
+}
+$(function(){
+	//_shd.init();
+	scHeader.init()
+	g_radioSerect();
+	scFooter.init();
+	g_pageTop()
+
+	var _resizeTm=null;
+	/*resize body class */
+	setBodyClass();
+
+	$(window).on('resize.bodyclass',function(){
+		if(_resizeTm){return;}
+		_resizeTm=setTimeout(function(){
+			clearTimeout(_resizeTm);
+			_resizeTm=null;
+			setBodyClass();
+			
+		},200);
+	});
+
+	
+	function setBodyClass(){
+		var SP_MAXWIDTH=767;
+		if ( window.innerWidth <= SP_MAXWIDTH ){
+			$('body').addClass('SP').removeClass('PC').attr('data-view','SP');
+		
+	   }else{
+		$('body').addClass('PC').removeClass('SP').attr('data-view','PC')
+	   }
+	}
+});

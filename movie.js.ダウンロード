@@ -1,0 +1,72 @@
+	//字幕ありでの未サポート管理
+var captionConf={
+	message:'※iPhone、iPod、一部のiPadでは字幕付きでご覧いただくことはできません。',
+	dasid:['D0005190212_00000']
+	
+
+};
+
+$(function(){
+	//SNS
+	var snsParent=$('#movieShare').find('.snsBtn')
+	snsParent.html('<div class="nhk-snsbtn" data-nhksns-iconsize="s" data-nhksns-disable="google line"></div>');
+	NHKSNS.initSNS();
+
+
+
+});
+
+//program.js.clip.jsから動画準備完了時呼び出し
+//iframeで親に高さを渡す
+function postParent(type){
+		//$('body').addClass('movieModal')
+	var h=$('#commonContainer').height();
+	if(type=='clip'){
+		h+=20;
+	};
+	if($('body').hasClass('PC')){
+		$('html').addClass('noScroll');
+	};
+	window.parent.postMessage({
+		'height': h
+	}, '*');
+};
+
+function postParentFullscreen(state){
+	//$('body').addClass('movieModal')
+	//モーダルだったらpostmassage
+	if($('body').hasClass('movieModal')){
+
+		window.parent.postMessage({
+			'fullscreen': state
+		}, '*');
+	}else{
+		
+	}
+};
+
+function setResizeParent(func){
+	var _resizeTm=null;
+	$(window).off('resize.postparent').on('resize.postparent',function(e){
+		if(_resizeTm){return;}
+		_resizeTm=setTimeout(function(){
+			clearTimeout(_resizeTm);
+			_resizeTm=null;
+			func()
+		},200);
+	});
+};
+// $(window).load(function() {
+// 	if(window.parent){
+// 		var delay=setTimeout(function(){
+// 			clearTimeout(delay)
+// 			var h=$('#commonContainer').height();
+// 			// h+=10;
+// 			console.log('iframe',h)
+// 			$('html').css({overflow:'hidden'})
+// 			window.parent.postMessage({
+// 				'height': h
+// 			}, '*');
+// 		},500);
+// 	}
+// });

@@ -1,0 +1,2111 @@
+$(function(){
+
+	if($('body').attr('id')=='playlist'){
+		school_playlist_control.init(function(){
+			var explain=$('.listNav>.explain').off()
+			g_movieLink.setAncPopLink(explain);
+		});
+
+		//リスト一覧画面
+		var listEdit=$('#listEdit');
+
+		/*モーダル制御 */
+	
+		//プレイリスト一覧内上部　新しいプレイリストを作成する
+		$('#viewTool').find('.addBtn>a').on('click',function(){
+			viewModal('new',{})
+			return false;
+		});
+		//プレイリスト一覧内上部　プレイリスト読み込み　
+		$('#viewTool').find('.importBtn>a').on('click',function(){
+			viewModal('import',{})
+			return false;
+		})
+
+		//プレイリスト view 公開確認　
+		listEdit.find('.exposeBtn>a').on('click',function(){
+			var name=listEdit.attr('data-listname')
+			viewModal('exposeConfirm',{name:name})
+			return false;
+		});
+
+		
+
+	}
+
+	
+	
+
+});
+
+
+/*モーダル表示制御 ==========================================　*/
+// type　viewModal
+// new 新しいプレイリストを作成する
+//removeConfirm プレイリスト削除確認
+//exposeConfirm　プレイリスト公開確認
+//import　プレイリスト読み込み
+//saveCheckError　プレイリスト編集保存エラー
+//unEdit　プレイリスト編集中アラート
+//copy クリップボードにコピー
+
+//type　_modalUpdate 
+//exposeComp　プレイリスト公開完了
+//importError　プレイリスト読み込みエラー　
+//importAdd　プレイリスト読み込み後の作成
+//saveError　プレイリスト保存エラー
+
+//msgOpt
+//name プレイリスト名
+//id プレイリストid
+
+function viewModal(type,msgOpt,listObj){
+	var _control=school_playlist_control;
+	var opt={
+		items:[
+			{type: 'inline',src:'#modal'}
+		],
+		width: '100%',height: '100%',
+		mainClass: 'mfp-fade',
+		removalDelay: 50,
+		preloader: false,
+		fixedContentPos: false,
+		// closeBtnInside:true,
+		fixedContentPos:true,
+		closeMarkup:'',
+		callbacks:{
+			open: function() {
+				$('body').addClass('modal')
+				var contents=$('#modal').addClass('show').find('.'+type).addClass('show');
+				
+				switch (type){
+					//プレイリスト作成
+					case 'new':
+						contents.find('.caution').removeClass('show')
+						contents.find('.add>a').off().on('click',function(){
+							
+							var _name=contents.find('.newName').val();
+							var check=_checkListLgt(_name);
+							var caution=contents.find('.noName')
+							if(check){
+								var ngw=_control.checkListWord(_name);
+								var ngname=_control.checkListName(_name);
+								if(ngw){
+									caution.addClass('show').html(ngw[0]+' は使用できません。')
+									return false;
+									
+								}
+								else if(ngname){
+									caution.addClass('show').html('既に同じ名前があります。')
+									return false;
+								};
+								var _setDate=new Date().getTime();
+								// if(_listName==_this.listName){
+								// 	_setDate=_this.setTime;
+								// }
+								var newList={};
+								newList.listName=_name
+								newList.items=[];
+								newList.setTime=_setDate;
+								_control.writeLocalList(newList,function(success){
+									//__updateView();
+									_control.initListNavi();
+									_control.initListAll();
+									_control.changeMode('list')
+									_modalClose();
+						
+								});
+							}
+							else if(check == 0){
+								caution.addClass('show').html('※プレイリスト名が入力されていません。');
+								return false;
+							};
+							
+							
+							return false;
+						});
+				
+					break;
+				//プレイリスト作成 selection用
+				case 'selection_new':
+			
+					contents.find('.caution').removeClass('show')
+					contents.find('.newName').val(msgOpt['name']);
+					contents.find('.add>a').off().on('click',function(){
+						
+						var _name=contents.find('.newName').val();
+						var check=_checkListLgt(_name);
+						var caution=contents.find('.noName')
+						if(check){
+							var ngw=_control.checkListWord(_name);
+							var ngname=_control.checkListName(_name);
+							if(ngw){
+								caution.addClass('show').html(ngw[0]+' は使用できません。')
+								return false;
+								
+							}
+							else if(ngname){
+								caution.addClass('show').html('既に同じ名前があります。')
+								return false;
+							};
+							var _setDate=new Date().getTime();
+							// if(_listName==_this.listName){
+							// 	_setDate=_this.setTime;
+							// }
+							var newList={};
+							newList.listName=_name;
+							newList.items=listObj.items;
+							newList.setTime=_setDate;
+							_control.writeLocalList(newList,function(success){
+								_modalClose();
+					
+							});
+						}
+						else if(check == 0){
+							caution.addClass('show').html('※プレイリスト名が入力されていません。');
+							return false;
+						};
+						
+						
+						return false;
+					});
+
+				break;
+					//プレイリスト削除確認
+					case 'removeConfirm':
+						var removename=msgOpt['name']
+						contents.find('.message>span').html(removename);
+						contents.find('.ok>a').off().on('click',function(){
+							_control.removeList(removename,function(){
+								_control.initListNavi();
+								_control.initListAll();
+								_control.changeMode('list')
+								_modalClose();
+							});
+							
+							return false;
+						});
+						contents.find('.cancel>a').off().on('click',function(){
+							_modalClose();
+							return false;
+						});
+					break;
+
+					//プレイリスト公開確認
+					case 'exposeConfirm':
+						contents.find('.message>span').html(msgOpt['name']);
+						contents.find('.ok>a').off().on('click',function(){
+							//api呼び出し後にモーダル更新〜取得ID表示
+							//ダミーでタイマー
+							// var tm=setTimeout(function(){
+							// 	clearTimeout(tm)
+							// 	_modalUpdate('exposeComp',{id:'00000',name:msgOpt['name']});
+							// },1000)
+							var _nowlist;
+							var _id=$('#listEdit').attr('data-listname');
+							for(var i=0;i<_control.allList.length;i++){
+								if(_control.allList[i].listName==_id){
+									_nowlist=_control.allList[i];
+									break;
+								}
+							};
+
+							_control.publishAppPlayList(_nowlist.items,function(_data){
+								if(_data){
+									var d=new Date(_data.expires.replace(/-/g,'/')).getTime()
+									var _listobj={
+										listName:_nowlist.listName,
+										items:_nowlist.items,
+										setTime:_nowlist.setTime,
+										expires:d,
+										playlistid:_data.playlistid
+									};
+									// console.log('///publish///')
+									// console.log(_listobj)
+									//save
+									_nowlist.expires=_data.expires;
+									_nowlist.playlistid=_data.playlistid;
+		
+									_control.writeLocalList(_listobj,function(){
+										//_control.viewListAll(_nowlist.listName);
+										//_listInit(_nowlist.listName);
+										_modalUpdate('exposeComp',{id:_data.playlistid,name:_nowlist.listName});
+		
+									});
+		
+								}else{
+									//console.log('公開エラー')
+								};
+		
+							});
+							return false;
+						});
+						contents.find('.cancel>a').off().on('click',function(){
+							_modalClose();
+							return false;
+						});
+					break;
+					
+					//プレイリスト読み込み
+					case 'import':
+						contents.find('.ok>a').off().on('click',function(){
+
+								var _id=contents.find('.importId').val();
+								//全角数字を半角
+								_id=_id.replace(/[０-９]/g, function(str) {
+									return String.fromCharCode(str.charCodeAt(0) - 0xFEE0);
+								});
+								//読み込み開始
+								_control.setPublishCopyList(_id,function(_listobj){
+									var $newelem;
+									//読み込み完了
+									if(_listobj){
+										_modalUpdate('importAdd',{},_listobj);
+									//読み込エラー
+									}else{
+										_modalUpdate('importError',{});
+							
+									}
+									
+								});
+							
+							
+							return false;
+						});
+					break;
+					
+					//プレイリスト保存エラー
+					case 'saveError':
+					
+					break;
+						
+					case 'saveCheckError':
+						var _name=msgOpt['name'];
+						var check=_checkListLgt(_name);
+						var caution=contents.find('.noName')
+						if(check){
+							var ngw=_control.checkListWord(_name);
+							var ngname=_control.checkListName(_name);
+							if(ngw){
+								caution.addClass('show').html(ngw[0]+' は使用できません。')
+					
+							}
+							else if(ngname){
+								caution.addClass('show').html('既に同じ名前があります。')
+							};
+						}
+						else if(check == 0){
+							caution.addClass('show').html('※プレイリスト名が入力されていません。')
+						};
+						contents.find('.close>a').off().on('click',function(){
+							_modalClose();
+							return false;
+						})
+					break;
+					
+					//編集中
+					case 'unEdit':
+						
+						contents.find('.close>a').off().on('click',function(){
+							_modalClose();
+							return false;
+						})
+					break;
+
+					//クリップボードにコピー
+					case 'copy':
+				
+						contents.find('.close>a').off().on('click',function(){
+							_modalClose();
+							return false;
+							
+						})
+					break;
+
+				};
+
+				$('.popupClose').on('click',function(){
+					_modalClose();
+					return false;
+				})
+			},
+			close:function(){
+				$('body').removeClass('modal');
+				$('#modal').removeClass('show').find('.contents').removeClass('show').find('.btnWrap>a').off();
+				$('#modal').find('input').val('').end().find('.caution').removeClass('show')
+				//console.log('close calback')
+			}
+		}
+	};
+
+	$.magnificPopup.open(opt);
+
+	//モーダルclose
+	function _modalClose(_cb){
+	
+		$.magnificPopup.close();
+		$.magnificPopup.instance.popupsCache = {};
+		//console.log('close func')
+		if(typeof _cb=='function'){
+			_cb()
+		}
+
+	}
+
+	//開いているモーダル内更新
+	function _modalUpdate(type,msgOpt,dataObj){
+		var _control=school_playlist_control;
+
+		var contents=$('#modal').find('.'+type).addClass('show');
+		contents.siblings('.contents').removeClass('show');
+		switch (type){
+			//プレイリスト公開完了
+			case 'exposeComp':
+				contents.find('.message>span').html(msgOpt['name']);
+				contents.find('.bg>p>span').html(msgOpt['id']);
+				contents.find('.close>a').off().on('click',function(){
+					_modalClose();
+					_control.initListNavi(msgOpt['name']);
+					_control.initListAll();
+				})
+			break;
+
+			//プレイリスト読み込み後の作成
+			case 'importAdd':
+				contents.find('.add>a').off().on('click',function(){
+					var _name=contents.find('.newName').val()
+					var check=_checkListLgt(_name);
+					var caution=contents.find('.noName')
+					if(check){
+						var ngw=_control.checkListWord(_name);
+					   var ngname=_control.checkListName(_name);
+						if(ngw){
+							caution.addClass('show').html(ngw[0]+' は使用できません。')
+				
+						   return false;
+					   }
+						else if(ngname){
+						  caution.addClass('show').html('既に同じ名前があります。')
+						   return false;
+					   }
+					   else{
+							var _listobj =dataObj;
+							caution.removeClass('show');
+							contents.find('.newName').val('');
+						   _listobj.listName=_name;
+						   _control.writeLocalList(_listobj,function(success){
+							   if(success){
+									_modalClose();
+									//再構築 
+									_control.initListNavi(_name);
+									_control.initListAll();
+							   }else{
+								   //alert('プレイリストの作成に失敗しました');
+								  // console.log('読み込み保存失敗',success)
+							   }
+
+							});
+					   };
+					  
+						
+					}
+					else if(check == 0){
+						caution.addClass('show').html('※プレイリスト名が入力されていません。')
+					};
+					return false;
+				});
+			break;
+
+			//プレイリスト読み込みエラー
+			case 'importError':
+				contents.find('.close>a').off().on('click',function(){
+					_modalClose();
+				})
+			break;
+
+
+			
+		
+		}
+	};
+	//新規リスト名チェック
+	function _checkListLgt(val){
+		if(val.length){
+			return 1
+		}else{
+			return 0;
+		}
+		
+	};
+};//viewModal
+
+
+
+var school_playlist_control={
+	STORAGE_KEY:'nol_school_playlist'
+	,ITEM_KEYS:['dasid','in','out']
+	,HISTORY_LISTNAME:'history'
+	,APP_API_URI:'https://api.school.nhk.or.jp/appapi/playlist'
+	,NG_SYMBOL:"|,:;="
+	,allList:null
+	,allDasList:{}
+	//表示中のプレイリスト
+	//,viewList:null
+	,MAX_NUM:50
+	
+	,changeMode:function(type,cb){
+		var _this=this;
+		var listView=$('#listView');
+		var listEdit=$('#listEdit');
+		var history =$('#playHistory');
+		var editParent=$('#editItems');
+		var editHistory =$('#historyItems');
+
+		//var items=$('#editItems').find('.editItemWrap')
+
+		//historyのみ
+		if(type == 'history'){
+			listView.addClass('hide');
+			listEdit.removeClass('show edit');
+			history.removeClass('edit').addClass('show');
+		
+		//リスト内item表示
+		}else if(type == 'view'){
+			listView.addClass('hide');
+			listEdit.addClass('show view').removeClass('edit');
+			history.removeClass('show edit');
+		
+		
+			//リスト内item編集
+		}else if(type == 'edit'){
+			listView.addClass('hide');
+			listEdit.addClass('show edit').removeClass('view');
+			history.addClass('show edit').removeClass('view');
+
+
+		//リスト一覧
+		}else if(type == 'list'){
+			listView.removeClass('hide');
+			listEdit.removeClass('show edit');
+			history.removeClass('show edit');
+		};
+		if(typeof cb=='function'){
+			cb();
+			//console.log(type)
+		}
+	}
+	,setDraggable:function(editParent){
+		var parent_id='#'+editParent.attr('id')
+
+		editParent.sortable( {
+			revert: true,
+			handle:'.bar'
+		});
+		editParent.on('sortstop',function(){
+			editParent.addClass('sort')
+			_updateNum();
+		})
+		var dragOpt={
+			axis:'y',
+			handle:'.bar',
+			//cancel:'.itemKyouka',
+			// disabled:true,
+			opacity:0.8,
+			containment: parent_id,
+			connectToSortable:parent_id,
+			revert: 'invalid'
+		}
+		var items=editParent.find('.editItemWrap')
+		items.draggable(dragOpt);
+	
+		// items.on('dragstart',function(){
+		// 	console.log('start')
+		// });
+		// items.on('dragstop',function(){
+			
+		// });
+
+		function _updateNum(){
+			editParent.find('.editItemWrap').each(function(n){
+				var __this=$(this)
+				__this.find('.order>span').html(n+1);
+			});
+		};
+
+	}
+	,removeDraggable:function(editParent){
+		var items=editParent.find('.editItemWrap');
+		if (items.data('ui-draggable')) { 
+			try {
+				items.draggable('destroy');
+				}
+			catch (e) {
+					
+			};
+			
+			editParent.sortable("destroy");
+			items.css({'width':'','height':''})
+		};
+		
+	}
+	,init:function(_initCb){
+		var _this=this;
+		var _allList=_this.getLocalListAll();
+		if(_allList && _allList.length){
+			_this.allList=_allList;
+			//最新を先頭に
+			_allList.sort(function(a,b){
+				if(a.setTime < b.setTime) return 1;
+				if(a.setTime > b.setTime) return -1;
+				return 0;
+			});
+		};	
+
+	
+	
+		//最新のリスト
+		var _nowlistName=_this.getNowListName();
+		//console.log(_allList);
+		_this.setHistoryEdit();
+
+		_this.initListNavi();
+		_this.initListAll();
+		
+
+		//左メニューリスト名以外
+		(function(){
+			$('#view').find('.listNav>div').on('click',function(e){
+				var editing=$('#listEdit').hasClass('edit');
+				var btn=$(this);
+				//再生履歴
+				if(btn.hasClass('history')){
+					if(editing){
+						//viewModal('unEdit',{})
+						var pos=$('#playHistory').find('h4').offset().top;
+						$('html, body').animate({
+							scrollTop: pos
+						}, 500);
+
+					}else{
+						_this.changeMode('history');
+						$('#listNaviMenu').find('li').removeClass('active')
+					}
+					// $('#playHistory').addClass('show');
+					// $('#listView').addClass('hide');
+					
+				//プレイリストを作る
+				}else if(btn.hasClass('addBtn')){
+					if(editing){
+						viewModal('unEdit',{})
+					}else{
+						viewModal('new',{})
+						return false;
+					}
+				//プレイリスト
+				}else if(btn.hasClass('listBtn')){
+					if(editing){
+						viewModal('unEdit',{})
+					}else{
+						_this.changeMode('list');
+						$('#listNaviMenu').find('li').removeClass('active')
+					}
+				};
+				return false
+			});
+		})();
+
+
+		// リスト内編集
+		(function(){
+
+			var editParent=$('#editItems');
+			var editHistory =$('#historyItems');
+
+			var listEdit=$('#listEdit');
+			//リスト内編集 view→edit移行ボタン
+			listEdit.find('.editBtn>a').on('click',function(){
+				//listEdit.addClass('edit').removeClass('view');
+				_this.changeMode('edit');
+				_this.setDraggable(editParent);
+				_this.setHistoryDraggable(editHistory)
+				return false
+			});
+
+			//リスト内編集 editキャンセルボタン
+			listEdit.find('.cancelBtn>a').on('click',function(){
+				//listEdit.removeClass('edit').addClass('view');
+				_this.changeMode('view');
+				_this.removeDraggable(editParent);
+				_this.removeHistoryDraggable(editHistory);
+				_listEditCancel()
+
+				return false;
+			});
+
+			//リスト内編集 view→edit移行ボタン（編集適用）
+			listEdit.find('.okBtn>a').on('click',function(){
+				//listEdit.removeClass('edit').addClass('view');
+				_listEditApply(function(d){
+					if(d){
+						_this.removeDraggable(editParent);
+						_this.removeHistoryDraggable(editHistory);
+						__updateView();
+						_this.changeMode('view');
+						//console.log(d)
+					}else{
+						viewModal('saveError',{})
+					}
+				});
+				
+				return false
+			});
+
+			//編集適用
+			function _listEditApply(_cb){
+				var nameParent=$('#edittName')
+				var inputName=nameParent.find('.inputName>input').val();
+				var originName=listEdit.attr('data-listname');
+				var newItems=[];
+
+				//非表示以外の要素のみ格納
+				$('#editItems').find('.editItemWrap').each(function(n){
+					var item=$(this)
+					if(!item.hasClass('editHide')){
+						newItems.push($(this).data())
+					};
+				});
+
+				var list;
+				//今までと同じ名前
+				if(inputName==originName){
+					list=_this.getListOne(inputName)
+					var _setDate=new Date().getTime();
+					// if(_listName==_this.listName){
+					// 	_setDate=_this.setTime;
+					// }
+	
+					list.items=newItems;
+					list.setTime=_setDate;
+					_this.writeLocalList(list,function(success){
+						
+						if(typeof _cb=='function'){
+							_cb(success)
+						};
+					});
+
+				}else{
+					//名前チェック入れる
+					var ngw=_this.checkListWord(inputName);
+					var ngname=_this.checkListName(inputName);
+					var ngLgth=inputName.length ? false:true;
+					if(ngw || ngname || ngLgth){
+						viewModal('saveCheckError',{name:inputName});
+						return;
+					}
+					
+					//deepCopyするために元のlistを元ネームで取得
+					list=_this.getListOne(originName);
+					//違う名前の場合はdeepCopy（removeで元の参照が消えるの
+					var newlist=Object.create(list);
+					//古いlist削除
+					_this.removeList(originName,function(){
+						
+						var _setDate=new Date().getTime();
+	
+						newlist.listName=inputName
+						newlist.items=newItems;
+						newlist.setTime=_setDate;
+						//新しいリスト書き込み
+						_this.writeLocalList(newlist,function(success){
+							
+							nameParent.find('.fixName>span').html(inputName)
+							listEdit.attr('data-listname',inputName);
+							_this.initListNavi();
+							_this.initListAll();
+							if(typeof _cb=='function'){
+								_cb(success)
+							};
+						});
+			
+					});
+				};
+
+			
+
+			};
+			
+			function __updateView(){
+				var ct=0;
+				$('#editItems').removeClass('editing sort').find('.editItemWrap').each(function(n){
+					var item=$(this)
+					if(item.hasClass('editHide')){
+						item.remove();
+					}else{
+						ct++;
+						item.find('.order>span').html(ct);
+					};
+					
+				});
+				if(ct<=0){
+					$('#listEdit').addClass('noItem')
+				}else{
+					$('#listEdit').removeClass('noItem')
+				}
+			};
+
+			//編集キャンセル
+			function _listEditCancel(){
+				var nameParent=$('#edittName');
+				var originName=listEdit.attr('data-listname');
+				nameParent.find('.inputName>input').val(originName);
+				var editParent=$('#editItems')
+				editParent.find('.historyAdd').remove();
+				//ソート変更ありはlistの順番で元に戻す
+				if(editParent.hasClass('sort')){
+					var list=_this.getListOne(originName);
+					for(var i=0;i<list.items.length;i++){
+						var dasid=list.items[i].dasid;
+						var item=editParent.find('.itemKyouka>a[data-dasid="'+dasid+'"]');
+						var itemWrap=item.parents('.editItemWrap')
+						editParent.append(itemWrap);
+						itemWrap.find('.order>span').html(i+1)
+					}
+					
+				}else{
+					
+				}
+				editParent.removeClass('editing sort').find('.editItemWrap').each(function(n){
+					$(this).removeClass('editHide mov').find('.order>span').html(n+1)
+				})
+			
+			};
+
+		})();
+		if(typeof _initCb=='function'){
+			_initCb()
+		};
+	}
+
+	//リスト内編集画面
+	,setListEdit:function(dasDataAry,listName){
+		//console.log(dasDataAry)
+		var _this=this;
+		$('#edittName').find('.fixName span').html(listName).end().find('input').val(listName);
+		$('#listEdit').removeClass('expose').addClass('noItem');
+		$('.applyBtn .caution').remove();
+		var itemParent=$('#editItems');
+		itemParent.find('a').off().end().html('')
+		
+		var list=_this.getListOne(listName);
+		//console.log(list)
+		
+		//公開中のリスト
+		$('#edittName').find('.expose').removeClass('show')
+		if(list.hasOwnProperty('expires') && parseInt(list.expires,10) != NaN){
+			var limitD=new Date(parseInt(list.expires,10));
+			var nowD=new Date();
+			if(limitD>nowD){
+				var afterDay='（'+limitD.getFullYear()+'年'+(limitD.getMonth()+1)+'月'+limitD.getDate()+'日'+limitD.getHours()+':'+limitD.getMinutes()+'まで公開）';
+				$('#edittName').find('.expose').addClass('show').find('.id').html(list.playlistid).siblings('.limit').html(afterDay)
+				$('#listEdit').addClass('expose');
+				var msg='<p class="caution">※公開中のプレイリストは編集できません</p>'
+				$('.applyBtn>.editBtn').append(msg)
+			};
+		};
+		var lstAry=list.items;
+		//生成はdasでは無く、list
+		for(var i=0;i<lstAry.length;i++){
+			var dasObj=_getDasOne(lstAry[i]['dasid'])
+			if(!dasObj){
+				continue;
+			};
+			$('#listEdit').removeClass('noItem');
+			var editWtap=$('<div class="editItemWrap" />').html('<div class="remove">削除</div>');
+			var wrap=$('<div class="itemWrap" />').html('<div class="order"><span>'+(i+1)+'</span></div>');
+			
+			var item=g_school_util.getItemKyoka(dasObj);
+			//item.find('a').removeAttr('href')
+			editWtap.data(lstAry[i])
+			var arrow='<div class="orderArrow"><div class="up arrow"></div><div class="bar"></div><div class="down arrow"></div></div>';
+			wrap.append(item,arrow);
+			editWtap.append(wrap);
+			itemParent.append(editWtap);
+			//_this.setDragEvent(editWtap);
+			
+		};
+
+	
+		_this.setItemEditEvent();
+		_this.setPrintBtn();
+		_this.setCopyBtn();
+
+		//LINK
+		g_movieLink.setLink(itemParent,{bangumibox:true,clipbox:true},function(){
+			itemParent.find('a[data-dasid]').off().on('click',function(){
+				var link=$(this).attr('href')
+				var conf=g_movieLink.mfpConf;
+				//conf.modal=true;
+				conf.items=[
+					{type: 'iframe',src:link}
+				];
+				$.magnificPopup.open(g_movieLink.mfpConf,0);
+				return false;
+			});
+
+		});
+		
+		//listのdasidから取得したdas要素を返す
+		function _getDasOne(_list_dasid){
+			for(var i=0;i<dasDataAry.length;i++){
+				if(dasDataAry[i]['dasId']==_list_dasid){
+					return dasDataAry[i]
+				};
+			};
+			return false;
+		};
+
+
+		//プレイリスト edit　リスト削除確認
+		$('#listEdit').find('.removeBtn>a').on('click',function(){
+			var name=$('#listEdit').attr('data-listname')
+			viewModal('removeConfirm',{name:name})
+			return false;
+		});
+
+		//未使用
+		function _updateAllDas(dasObj){
+			var list=_this.allDasList;
+			if(!list.hasOwnProperty(dasObj['dasId'])){
+				list[dasObj['dasId']]=dasObj;
+			};
+		};
+		
+	}
+	//未使用
+	,setDragEvent:function(editWtap){
+	
+		return
+			var isDrag=false
+			var supportTouch = 'ontouchend' in document;
+			//console.log('supportTouch:',supportTouch)
+			var EVENTNAME_TOUCHSTART = supportTouch ? 'touchstart' : 'mousedown';
+			var EVENTNAME_TOUCHMOVE = supportTouch ? 'touchmove' : 'mousemove';
+			var EVENTNAME_TOUCHEND = supportTouch ? 'touchend' : 'mouseup';
+			var dropEndAry=[]
+			var parent=$('#listEdit')
+			editWtap.on(EVENTNAME_TOUCHSTART,function(e) {
+				if(!parent.hasClass('edit')){
+					return false
+				}
+				e.preventDefault()
+				var tgt=$(e.target) 
+				if(tgt.hasClass('up') || tgt.hasClass('down') || tgt.hasClass('remove')){
+					return
+				}
+				$(this).addClass('mov').append($('<div class="hitArea" />'));
+				this.pageX = (supportTouch ? e.changedTouches[0].pageX : e.pageX);
+				this.pageY = (supportTouch ? e.changedTouches[0].pageY : e.pageY);
+				this.left = $(this).position().left;
+				this.top = $(this).position().top;
+				isDrag=true
+				return false
+			});
+			editWtap.on(EVENTNAME_TOUCHMOVE,function(e) {
+				if(!parent.hasClass('edit')){
+					return false
+				}
+				if (!isDrag) {
+					return;
+				}
+				e.preventDefault(); 
+				var offX=this.pageX - (supportTouch ? e.changedTouches[0].pageX : e.pageX);
+				var offY=this.pageY - (supportTouch ? e.changedTouches[0].pageY : e.pageY);
+				this.left -= offX;
+				this.top -= offY ;
+                
+				$(this).css({"top":this.top});
+				this.pageX = (supportTouch ? e.changedTouches[0].pageX : e.pageX);
+				this.pageY = (supportTouch ? e.changedTouches[0].pageY : e.pageY);
+				//_checkHit($(this))
+				return false;
+			});
+			editWtap.on(EVENTNAME_TOUCHEND,function(e) {
+				if(!parent.hasClass('edit')){
+					return false
+				}
+				if (!isDrag) {
+                    
+					return;
+				}
+				$('#editItems').addClass('sort')
+				isDrag = false;
+				console.log(dropEndAry)
+				
+				// if(dropEndAry.length==2){
+				// 	//2
+				// 	if(dropEndAry[0] == (dropEndAry[1]-1)){
+				// 		parent.find('.editItemWrap').eq(dropEndAry[0]).after($(this))
+				// 	}
+				// }else{
+				// 	//先頭
+				// 	if(dropEndAry[0] == 0){
+				// 		parent.find('.editItemWrap').eq(0).before($(this))
+					
+				// 	}else{
+				// 		parent.find('.editItemWrap').eq(dropEndAry[0]).after($(this))
+				// 	}
+					
+				// }
+
+				$(this).removeClass('mov').css('top','').find('.hitArea').remove()
+				parent.find('.editItemWrap').removeClass('hit hitTop').each(function(n){
+					$(this).find('.order>span').html(n+1)
+				})
+				e.preventDefault()
+				return false;
+			});
+
+			function _checkHit(elem){
+				var movItem=elem.find('.hitArea')
+				var rectBtm=movItem.height()
+				var hitNum=[]
+				var items=$('#editItems')
+				items.find('.editItemWrap').each(function(n){
+					var wrapItem=$(this)
+					if(!wrapItem.hasClass('mov')){
+						var topHit=(movItem.offset().top+rectBtm)>wrapItem.offset().top;
+						var btmHit=movItem.offset().top<(wrapItem.offset().top+wrapItem.height())
+			
+						if(topHit && btmHit){
+							hitNum.push(n);
+							items.find('.editItemWrap').eq(hitNum[0]).addClass('hit')
+							dropEndAry=hitNum;
+							if(dropEndAry.length==1 && hitNum[0]!=0){
+								items.find('.editItemWrap').removeClass('hit hitTop').eq(hitNum[0]).addClass('hit')
+							}
+							if(dropEndAry.length==1 && hitNum[0]==0){
+								items.find('.editItemWrap').removeClass('hit hitTop').eq(hitNum[0]).addClass('hitTop')
+							}
+							
+						}else{
+							//$('#editItems').find('.editItemWrap').removeClass('hit')
+						}
+						
+						
+					}
+				})
+			};
+
+			//未使用
+			function __getPos(e){
+				var origin = e.originalEvent;
+				var posX= origin.changedTouches ? origin.changedTouches[0].pageX :origin.pageX;
+				var posY= origin.changedTouches ? origin.changedTouches[0].pageY :origin.pageY;
+
+				//console.log(origin.pageX,e.pageX)
+				return {x:posX,y:posY};
+			};
+
+	}
+	//リスト内編集のitem削除、order反映、event定義
+	,setItemEditEvent:function(){
+		var _this=this;
+
+		var editParent=$('#editItems');
+		var viewCt=1;
+		var items=editParent.find('.editItemWrap')
+		items.each(function(n){
+			var itemwarap=$(this)
+			if(!itemwarap.hasClass('editHide')){
+				itemwarap.find('.order>span').html(viewCt)
+				viewCt++
+			};
+			
+			itemwarap.find('.remove').off().on('click',function(){
+				//非表示class追加　removeは編集確定時
+				var removeItem=$(this).parent('.editItemWrap').addClass('editHide');
+				//var removeDasid=removeItem.data('dasid');
+				_this.setItemEditEvent();
+				//書き換えがあったらclass追加
+				editParent.addClass('editing');
+			});
+			itemwarap.find('.up').off().on('click',function(){{
+				var thisPos=editParent.find('.editItemWrap').index(itemwarap);
+				if(thisPos<=0){
+					return false;
+				}
+				
+				var prevItem=editParent.find('.editItemWrap').eq(thisPos-1);
+				itemwarap.fadeTo(100,0);
+				
+				prevItem.fadeTo(100,1,function(){
+					prevItem.before(itemwarap)
+					itemwarap.fadeTo(300,1);
+					_updateSort()
+				});
+				editParent.addClass('sort');
+			}});
+			itemwarap.find('.down').off().on('click',function(){{
+				var thisPos=editParent.find('.editItemWrap').index(itemwarap);
+		
+				var nextItem=editParent.find('.editItemWrap').eq(thisPos+1);
+				if(nextItem.length<=0){
+					return false
+				}
+				itemwarap.fadeTo(100,0);
+				
+				nextItem.fadeTo(100,1,function(){
+					nextItem.after(itemwarap)
+					itemwarap.fadeTo(300,1);
+					_updateSort()
+				});
+				editParent.addClass('sort');
+			}})
+			
+		});
+
+		function _updateSort(){
+			var viewCt=1;
+			editParent.find('.editItemWrap').each(function(n){
+				var itemwarap=$(this)
+				if(!itemwarap.hasClass('editHide')){
+					itemwarap.find('.order>span').html(viewCt)
+					viewCt++
+				};
+			})
+		}
+
+	
+	}
+	//左メニュー生成
+	,initListNavi:function(viewname){
+		var _this=this;
+		var _allList=_this.allList;
+		$('#listNaviMenu').find('a').off().end().remove();
+
+		if(_allList){
+			var lg=_allList.length;
+			var ul=$('<ul id="listNaviMenu" />');
+			for(var i=0;i<lg;i++){
+				var name=_allList[i].listName;
+				if(name==_this.HISTORY_LISTNAME){
+					continue;
+				};
+				var anc='<a href="#" data-listName="'+name+'">'+name+'</a>';
+				var li=$('<li />').html(anc);
+				
+				ul.append(li);
+				
+			}
+			$('#view').find('.listNav>.addBtn').before(ul);
+			_setListNavEvent(viewname);
+		}else{
+			//console.log('作成したリストなし')
+		};
+
+		//左メニュー作成後のevent付与
+		function _setListNavEvent(_viewname){
+			//左メニューリストクリック
+			$('#view').find('.listNav li>a').on('click',function(){
+				//viewモードでのみ切り替え
+				var viewListName=$(this).attr('data-listName');
+				var listEdit=$('#listEdit');
+
+				if(!listEdit.hasClass('edit')){
+					//表示中
+					if($(this).parent('li').hasClass('active')){
+						return false
+					};
+					_this.changeMode('view');
+
+					$(this).parent('li').addClass('active').siblings('li').removeClass('active');
+					//console.log('change',viewListName)
+					_this.setListView(viewListName,function(data){
+						listEdit.attr('data-listName',viewListName);
+					});
+					
+				}else{
+					viewModal('unEdit',{})
+				};
+				
+				return false;
+			});
+			if(_viewname){
+				$('#view').find('.listNav li>a[data-listName="'+_viewname+'"]').trigger('click');
+			};
+		};
+	
+	}
+	//左メニュークリックからの初期リスト内表示
+	,setListView:function(viewListName,cb){
+		var _this=this;
+		var viewList=_this.getListOne(viewListName)
+		var dasAry=[];
+		for(var j=0;j<viewList.items.length;j++){
+			dasAry.push(viewList.items[j]['dasid'])
+		}
+		// _this.setListEdit([],viewListName)
+		// cb()
+		// return;
+		if(dasAry.length){
+			g_school_util.getDasInfo(dasAry,function(_data){
+				if(_data && _data.response.records){
+					var ary=_data.response.records;
+					_this.setListEdit(ary,viewListName)
+					cb()
+				}else{
+					//console.log('dasdata error')
+				}
+				
+			})
+		}else{
+			_this.setListEdit([],viewListName)
+			cb()
+		}
+		
+	}
+	//右リスト名一覧
+	,initListAll:function(){
+		var _this=this;
+		var _allList=_this.allList;
+		var itemParent=$('#viewLists').find('a').off().end().html('');
+		$('#listView').removeClass('noList');
+		if(_allList){
+			var lg=_allList.length;
+			if(lg==0){
+				$('#listView').addClass('noList');
+				return
+			}
+			for(var i=0;i<lg;i++){
+				var itemObj=_allList[i]
+				var name=itemObj.listName;
+				if(name==_this.HISTORY_LISTNAME){
+					//りれきのみ
+					if(lg==1){
+						//itemParent.append('<p>作成したプレイリストはありません</p>');
+						$('#listView').addClass('noList');
+					}else{
+
+					}
+					continue;
+				};
+				var item='<div class="listItem">';
+				item+='<span class="name">'+name+'</span>';
+				//公開中のリスト
+				if(itemObj.hasOwnProperty('expires') && parseInt(itemObj.expires,10) != NaN){
+					var limitD=new Date(parseInt(itemObj.expires,10));
+					var nowD=new Date();
+					if(limitD>nowD){
+						var min= limitD.getMinutes();
+						min= min <10 ? '0'+min : min;
+						var afterDay='（'+limitD.getFullYear()+'年'+(limitD.getMonth()+1)+'月'+limitD.getDate()+'日'+limitD.getHours()+':'+min+'まで公開）'
+						item+='<div class="expose">公開ID<span class="id">'+itemObj.playlistid+'</span><span class="limit">'+afterDay+'</span></div>';
+					};
+				};
+				item+='<div class="remove"><img src="img/bt_trash.svg" alt="削除"></div>'
+				item+='</div>'
+				item=$(item);
+				itemParent.append(item);
+				item.find('.name').on('click',function(){
+					var _name=$(this).text()
+					$('#view').find('.listNav li>a[data-listName="'+_name+'"]').trigger('click');
+				});
+
+			};
+			
+			// プレイリスト一覧内削除確認
+			itemParent.find('.listItem .remove').on('click',function(){
+				var name=$(this).siblings('span').text();
+				viewModal('removeConfirm',{name:name});
+				return false;
+			});
+			
+			
+		}else{
+			//console.log('作成したリストなし');
+			//$('#listView>.inner').prepend(msg)
+			//itemParent.append('<p>作成したプレイリストはありません</p>');
+			$('#listView').addClass('noList');
+		};
+	}
+	
+	,setHistoryDraggable:function(editParent){
+		var device=nol_getDeviceType()
+		if(device[0]=='smart'){
+			return
+		}
+		var dragOpt={
+			// disabled:true,
+			opacity:0.8,
+			helper: 'clone',
+			revert: 'invalid'
+		}
+		var items=editParent.find('.historyItemWrap')
+		items.draggable(dragOpt);
+		$("#dropArea").droppable({
+			accept: ".historyItemWrap",
+			hoverClass:'dropHover',
+			drop: function( event, ui ) {
+				ui.draggable.find('.addBtn').trigger('click')
+			}
+		  });
+		// items.on('dragstart',function(){
+		// 	console.log('start')
+		// });
+		// items.on('dragstop',function(){
+			
+		// });
+
+		function _updateNum(){
+			editParent.find('.editItemWrap').each(function(n){
+				var __this=$(this)
+				__this.find('.order>span').html(n+1);
+			});
+		};
+
+	}
+	,removeHistoryDraggable:function(editParent){
+		var items=editParent.find('.historyItemWrap');
+		if (items.data('ui-draggable')) { 
+			items.css({'width':'','height':''});
+			$("#dropArea").droppable('destroy');
+			try {
+				items.draggable('destroy');
+				}
+			catch (e) {
+					
+			};
+		};
+
+		
+	}
+	//再生履歴初期表示
+	,setHistoryEdit:function(){
+		var _this=this;
+		var h_name=_this.HISTORY_LISTNAME;
+		var viewList=_this.getListOne(h_name);
+		var historyParent=$('#historyItems')
+		//履歴無し
+		if(!viewList){
+			//cb(false);
+			historyParent.html('<p class="noHistory">再生履歴はありません</p>')
+			return
+		}
+		var dasAry=[];
+		for(var j=0;j<viewList.items.length;j++){
+			dasAry.push(viewList.items[j]['dasid'])
+		}
+		g_school_util.getDasInfo(dasAry,function(data){
+
+			historyParent.find('a').off().end().html('')
+			if(data && data.response.records){
+				_view(data.response.records)
+				
+			}else{
+				//console.log('dasdata error history')
+			}
+		});
+
+		function _view(dasDataAry){
+			var ary=viewList.items;
+
+			for(var i=0;i<ary.length;i++){
+				var dasObj=_getDasOne(ary[i]['dasid']);
+				if(!dasObj){
+					continue;
+				}
+				var tool='<div class="itemTool"><div class="order"><span>'+(i+1)+'</span></div><div class="addBtn"><span><img src="img/bt_historyadd.svg" alt="プレイリストに追加"></span></div><div class="removeBtn"><span>削除</span></div></div>';
+				var historyWrap=$('<div class="historyItemWrap" />').html(tool).data(ary[i]);
+				
+				var item=g_school_util.getItemKyoka(dasObj);
+				
+				historyWrap.append(item)
+				
+				historyParent.append(historyWrap);
+
+				historyWrap.find('.addBtn').on('click',function(){
+					var wrap=$(this).parents('.historyItemWrap');
+					var item=wrap.find('.itemKyouka')
+					
+					var msg=$('<div class="addMsg"><span>プレイリストに追加しました</span></div>')
+					wrap.append(msg)
+					msg.delay(500).fadeTo(400,0,function(){
+						msg.remove()
+						_updateHistoryAdd(item.clone(true),wrap.data());
+					});
+					
+					// var thumb=item.find('.thumb').clone().addClass('addImg');
+					// wrap.append(thumb)
+					// var endPos=$('#listEdit').height()+$('#listEdit').offset().top-$(this).offset().top;
+					// thumb.animate({'top':endPos,'opacity':0},500,function(){
+					// 	thumb.remove();
+					// 	//_updateHistoryAdd(item.clone(true),wrap.data());
+					// })
+					
+				});
+
+				historyWrap.find('.removeBtn').on('click',function(){
+					var wrap=$(this).parents('.historyItemWrap')
+					var removeDasId=wrap.find('.itemKyouka>a').off().attr('data-dasid')
+					wrap.remove();
+					_updateHistoryRemove(removeDasId);
+					
+				});
+				//console.log(historyWrap.data())
+			};
+			
+			//LINK
+			g_movieLink.setLink(historyParent,{bangumibox:true,clipbox:true},function(){
+				historyParent.find('a[data-dasid]').off().on('click',function(){
+					var link=$(this).attr('href')
+					var conf=g_movieLink.mfpConf;
+					//conf.modal=true;
+					conf.items=[
+						{type: 'iframe',src:link}
+					];
+					$.magnificPopup.open(g_movieLink.mfpConf,0);
+					return false;
+				});
+
+			});
+
+		
+	
+
+			//listのdasidから取得したdas要素を返す
+			function _getDasOne(_list_dasid){
+				for(var i=0;i<dasDataAry.length;i++){
+					if(dasDataAry[i]['dasId']==_list_dasid){
+						return dasDataAry[i]
+					};
+				};
+				return false;
+			};
+
+			//itemをaddしてリストupdate historyAddを追加
+			function _updateHistoryAdd(item,itemData){
+				var editWtap=$('<div class="editItemWrap historyAdd" />').html('<div class="remove">削除</div>').data(itemData);
+	
+				var wrap=$('<div class="itemWrap" />').html('<div class="order"><span>'+1+'</span></div>');
+				var arrow='<div class="orderArrow"><div class="up arrow"></div><div class="bar"></div><div class="down arrow"></div></div>';
+				wrap.append(item,arrow)
+				editWtap.append(wrap);
+				//書き換えがあったらediting class追加
+				$('#editItems').append(editWtap).addClass('editing');
+				_this.setItemEditEvent();
+				//_this.setDragEvent(editWtap);
+			};
+
+			//history item削除
+			function _updateHistoryRemove(_removeDasid){
+				historyParent.find('.historyItemWrap').each(function(n){
+					$(this).find('.order>span').html(n+1);
+				});
+				_this.removeItemWrite(h_name,_removeDasid);
+			};
+		};
+
+	}
+	
+	//item表示削除後の書き込み　historyのみ使用
+	,removeItemWrite:function(_listName,_removeDasid,_cb){
+		var _this=this;
+		var list=_this.getListOne(_listName);
+		if(list){
+			for(var i=0;i<list.items.length;i++){
+				if(list.items[i]['dasid']==_removeDasid){
+					list.items.splice(i,1);
+				};
+			};
+			var _setDate=new Date().getTime();
+			// if(_listName==_this.listName){
+			// 	_setDate=_this.setTime;
+			// }
+			// var _obj={
+			// 	listName:_listName,
+			// 	items:newItems,
+			// 	setTime:_setDate
+			// };
+			list.setTime=_setDate;
+			_this.writeLocalList(list,function(success){
+				if(typeof _cb=='function'){
+					_cb(success)
+				};
+			});
+		};
+	}
+	
+	//allListから該当のリスト取得 use
+	,getListOne:function(_listName){
+		var _this=this;
+		var allList=_this.allList;
+		if(allList){
+			for(var i=0;i<allList.length;i++){
+				if(allList[i]['listName']==_listName){
+					return allList[i]
+				};
+			};
+		}
+		return false;
+	}
+
+	//公開リストの複製保存　use
+	,setPublishCopyList:function(_loadId,cb){
+		var _this=this;
+		var appCb={
+			done:function(appdata_){
+				// console.log('loadApiDone************************')
+				// console.log(appdata_);
+	
+				var _setDate=new Date().getTime();
+				var _setlistAry=[];
+
+				var dasary=appdata_.dasids.split(',');
+				var ioary=false;
+				if(appdata_.inout){
+					ioary=appdata_.inout.split(',');
+				}
+				for(var i=0;i<dasary.length;i++){
+					var o={
+						'dasid':dasary[i]
+					};
+					if(ioary && ioary[i].length){
+						o['in']=ioary[i].split('-')[0];
+						o['out']=ioary[i].split('-')[1];
+					};
+					_setlistAry.push(o);
+					// if(_setlistAry.length>20){
+					// 	break;
+					// };
+				};
+				var _obj={
+					items:_setlistAry,
+					setTime:_setDate
+				};
+				cb(_obj);
+	
+			},
+			fail:function(appdata_){
+				// console.log('fail-----')
+				// console.log(appdata_)
+				cb(false);
+			}
+		};
+		_this.getAppPlayList(_loadId,appCb);
+
+
+	}
+	//公開リストを取得　use
+	,getAppPlayList:function(_name,_cbObj){
+		var _this=this;
+		var _u=_this.APP_API_URI+'?playlistid='+_name;
+		$.ajax({
+			type : 'GET',
+			url : _u,
+			dataType : 'json',
+			cache:true
+		})
+		.done(function(data_,status_,xhr_){
+			var _status=data_.status
+			if(_status && _status==1){
+				_cbObj.done(data_);
+				return;
+			}else{
+				_cbObj.fail(_status);
+				return;
+			};
+		})
+		.fail(function(){
+			_cbObj.fail(false);
+		});		
+
+	}
+	//リストを公開 use
+	,publishAppPlayList:function(_items,_cb){
+		var dasAry=[];
+		var ioAry=[]
+		for(var i=0;i<_items.length;i++){
+			var item=_items[i];
+			dasAry.push(item.dasid);
+			if((item['in'] && item['in'].length) && (item['out'] && item['out'].length)){
+				ioAry.push(item['in']+'-'+item['out']);
+			}else{
+				ioAry.push('');
+			};
+		};
+		var _this=this;
+		var _q={
+			'dasids':dasAry.join(',')
+			,'inout':ioAry.join(',')
+			,'appver':1000
+		};
+
+		$.ajax({
+			type : 'POST',
+			data:_q,
+			url : _this.APP_API_URI,
+			dataType : 'json'
+		})
+		.done(function(data_,status_,xhr_){
+			//console.log('publishdone')
+			var _status=data_.status
+			if(_status && _status==1){
+				_cb(data_);
+				return;
+			}else{
+				_cb(false);
+				return;
+			};
+		})
+		.fail(function(){
+			//console.log('publishfail');
+			_cb(false);
+		});		
+
+	}
+	//印刷ボタン
+	,setPrintBtn:function(_id){
+		var $btn=$('#view').find('.applyBtn .printBtn').find('a');
+		$btn.off().on('click',function(e){
+			var _name=$('#listEdit').attr('data-listname');
+			var _w=window.open('print.html?listname='+_name,'printwindow')
+			if(!_w){
+				window.location.href='print.html?listname='+_name;
+			}
+			
+			return false;
+		})
+	}
+	//URL一括コピ＝ボタン
+	,setCopyBtn:function(){
+		var $btn=$('#view').find('.applyBtn .copyBtn').find('a');
+		$btn.off().on('click',function(e){
+			var st=$('#edittName').find('.fixName').text()+'\n\n';
+			$('#editItems').find('.editItemWrap').each(function(n){
+				var anc=$(this).find('.itemKyouka>a');
+				var link='https:'+anc.attr('href').replace(/\&p=box|\?p=box/gi,'');
+				var title=anc.find('.detail>.pgTitle').length ? anc.find('.detail>.pgTitle').html()+'：' : '';
+				title+=anc.find('.detail>.title').html();
+
+				st+=(n+1)+' '+title+'\n'+link+'\n\n'
+
+			});
+			navigator.clipboard.writeText(st).then(function() {
+				viewModal('copy',{});
+
+			  }).catch(function(error) {
+				//alert((error && error.message) || 'コピーに失敗しました')
+			  });
+
+			return false;
+		});
+	}
+	//予約文字との照合 use
+	,checkListWord:function(_name){
+		var _this=this;
+		var ng='['+_this.NG_SYMBOL+']';
+		var reg=new RegExp(ng,'g');
+		var check=reg.exec(_name);
+		return check
+	}
+	//既存のプレイリスト名と照合（trueで同じ名前あり） use
+	,checkListName:function(_name){
+		var _this=this;
+		if(!_this.allList){
+			return false;
+		};
+		for(var i=0;i<_this.allList.length;i++){
+			if(_name==_this.allList[i].listName){
+				return true;
+			};
+		};
+		return false;
+	}
+	
+	
+	//最新編集のプレイリスト名取得（history除く） use
+	,getNowListName:function(){
+		var _this=this;
+		var _name=false;
+
+		var _allList=_this.allList;
+		//var _allList=_this.getLocalListAll();
+		if(!_allList || _allList.length<1){
+			return false;
+		}
+		var tm=0;
+		for(var i=0;i<_allList.length;i++){
+
+			// if(_allList[i].listName.length<1){
+			// 	continue;
+			// };
+			if((tm<_allList[i].setTime) && (_allList[i].listName!=_this.HISTORY_LISTNAME)){
+				tm=_allList[i].setTime;
+				_name=_allList[i].listName
+			};
+		};
+		if(_name=='history'){
+			return false;
+		};
+		return _name;	
+	}
+
+	//表示中のリスト削除 use
+	,removeList:function(_name,_cb){
+		var _this=this;
+		var _data=_this.allList;
+		if(_name==_this.HISTORY_LISTNAME){
+			return;
+		}
+		for(var i=0;i<_data.length;i++){
+			if(_data[i].listName==_name){
+				_data.splice(i,1);
+				break;
+			};
+		};
+		_this.storageIF.write(_this.STORAGE_KEY,_data,function(){
+			_this.allList=_data
+			_cb()
+			
+		});
+
+	}
+
+	//item用objの使わないデータ削除
+	,getCleanObj:function(_o){
+		var _this=this;
+		var _r={};
+		for(var i=0;i<_this.ITEM_KEYS.length;i++){
+			var _key=_this.ITEM_KEYS[i];
+			_r[_key]=_o[_key];
+		};
+		return _r;
+	}
+	//use
+	,getLocalList:function(_listname){
+		var _this=this;
+		var _data=_this.getLocalListAll()
+		for(var j=0;j<_data.length;j++){
+			if(_data[j].listName==_listname){
+				return _data[j];
+			}
+		};
+		return false;
+	}
+
+	//use
+	,getLocalListAll:function(){
+		var _this=this;
+		var _data=_this.storageIF.get(_this.STORAGE_KEY);
+		if(_data){
+			return _data;
+		}else{
+			return false;
+		};
+		
+	}
+
+	//_obj:一つのプレイリストobj use
+	,writeLocalList:function(_obj,_cb){
+		var _this=this;
+		var _data=_this.getLocalListAll();
+		if(_data && _data.length){
+			//重複は削除
+			for(var i=0;i<_data.length;i++){
+				if(_data[i].listName==_obj.listName){
+					_data.splice(i,1);
+					break;
+				};
+			};
+		}else{
+			_data=[];
+		}
+		//itemがあった場合のみ追加（itemがなかったら削除）
+		// if(_obj.items.length){
+		// 	_data.unshift(_obj);
+		// };
+		_data.unshift(_obj);
+		//console.log(_data)
+		_this.storageIF.write(_this.STORAGE_KEY,_data,function(success){
+			if(success){
+				_this.allList=_data;
+			}
+			if(typeof _cb=='function'){
+				_cb(success);
+			};
+		});
+	}
+	//_o:セットするitem reciever.html　からよばれる
+	,setLocalList:function(_o,_cb){
+		var _this=this;
+		_o=_this.getCleanObj(_o);
+		var reg=/D(\d{10})_(\d{5})/;
+		var check=reg.test(_o.dasid);
+		if(!check || _o.dasid.length!=17){
+			return;
+		}
+
+		//initせずに直接呼び出しがあるので、storageから読み込む
+		var _data=_this.getLocalListAll();
+		//履歴に固定
+		var _listname=_this.HISTORY_LISTNAME;
+
+		//セットするitems
+		var _listItemAry=[];
+		var _d=new Date().getTime();
+		//
+		if(_data && _data.length){
+			//履歴のリスト抽出
+			for(var j=0;j<_data.length;j++){
+				if(_data[j].listName==_listname){
+					_listItemAry=_data[j].items;
+					_d=_data[j].setTime;
+					break;
+				}
+			}
+			if(_listItemAry.length){
+				//alert(_listname+'----------'+_listItemAry[0].listName)
+				//historyでの重複dasidは削除
+				for(var i=0;i<_listItemAry.length;i++){
+					if(_listItemAry[i].dasid==_o.dasid){
+						_listItemAry.splice(i,1);
+						break;
+					}
+				}
+			}else{
+				_listItemAry=[];
+			}
+		}else{
+			_listItemAry=[];
+		};
+		_listItemAry.unshift(_o);
+
+		//リスト内登録数オーバー
+		if(_listItemAry.length>_this.MAX_NUM){
+			_listItemAry=_listItemAry.slice(0,_this.MAX_NUM)
+		};
+		var _listObj={
+			listName:_listname,
+			items:_listItemAry,
+			setTime:_d
+		};
+		_this.writeLocalList(_listObj,_cb);
+	
+	}
+	,storageIF:{
+		get:function(_key){
+			return this.getCookie(_key)
+
+			// var storage=window.localStorage;
+			// if(storage){
+			// 	var _data=storage.getItem(_key)
+			// 	if(_data){
+			// 		console.log('storage-----get')
+			// 		console.log(_data)
+			// 	return JSON.parse(_data);
+			// 	}else{
+			// 		return false;
+			// 	}
+			// }else{
+
+			// };
+			// return false;
+		}
+		,write:function(_key,_data,_cb){
+			this.writeCookie(_key,_data,_cb);
+			return;
+			var _val=_data
+			// var storage=window.localStorage;
+			// if(storage){
+   //              console.log('removeStorage')
+   //              storage.removeItem(_key);
+
+			// 		_val=JSON.stringify(_val)
+			// 		storage.setItem(_key,_val);
+
+
+			// }else{
+
+				
+			// };
+		
+			// if(typeof _cb=='function'){
+			// 	_cb(_data);
+			// };
+		
+		}
+		,getCookie:function(_key){
+			var cook=document.cookie;
+			if(cook!=''){
+				cook=decodeURIComponent(document.cookie);
+				var cooks=cook.split('; ');
+				var _data=false;
+				for(var i=0;i<cooks.length;i++){
+					var c=cooks[i].split('=');
+					if(c[0] == _key){
+						_data=c[1];
+						break;
+					};
+				};
+				if(_data){
+
+					var _allListAry=_data.split('||');
+					if(_allListAry || _allListAry.length){
+						_data=[]
+						for(var i=0;i<_allListAry.length;i++){
+							var listObj={};
+							var tmp=_allListAry[i].split(':');
+							listObj['listName']=tmp[0];
+							listObj['setTime']=parseInt(tmp[1],10);
+							listObj['items']=[];
+							var ary=tmp[2].split('|');
+							if(ary.length && ary[0]!='false'){
+								for(var k=0;k<ary.length;k++){
+									var _subary=ary[k].split(',');
+									var _o={
+										dasid:_subary[0],
+										in:_subary[1],
+										out:_subary[2]
+									};
+									listObj['items'].push(_o);
+								};
+							};
+							listObj['expires']=tmp[3];
+							listObj['playlistid']=tmp[4];
+						// if(tmp.length==4){
+							// 	listObj['expires']=tmp[3]
+							// }
+
+							_data.push(listObj);
+						};
+					}
+				};
+
+				return _data;
+			}else{
+				return false;
+			};
+			return false;
+		}
+		,writeCookie:function(_key,_data,_cb){
+			var str=''
+			for(var j=0;j<_data.length;j++){
+				str+=_data[j].listName+':';
+				str+= _data[j].setTime.toString() ;
+				if(_data[j].items.length){
+					str+= (':'+_getAryStr(_data[j].items));
+				}else{
+					str+= ':false'
+				}
+				
+				if(_data[j].hasOwnProperty('expires')){
+					str+= (':'+_data[j].expires);
+				}else{
+					str+= ':false'
+				};
+				if(_data[j].hasOwnProperty('playlistid')){
+					str+= (':'+_data[j].playlistid);
+				}else{
+					str+= ':false'
+				};			
+				str+='||'
+			};
+
+			str=str.substr(0,str.length-2)
+
+			var s='';
+
+			var max_day=365;
+			var expire = new Date();
+			expire.setTime(expire.getTime() + (1000 * 3600 * 24)*max_day);
+			var encData=encodeURIComponent(str);
+			var d=_key+'='+encData+'; '+s+'expires='+expire.toGMTString()+'; domain=.nhk.or.jp; Secure; path=/';
+			document.cookie=d;
+
+			if(typeof _cb=='function'){
+				var delay=setTimeout(function(){
+					clearTimeout(delay);delay=null;
+					var r=decodeURIComponent(document.cookie);
+					var loadcooks=r.split('; ');
+					var _data=false;
+
+					for(var i=0;i<loadcooks.length;i++){
+						var c=loadcooks[i].split('=');
+						if(c[0] == _key){
+							_data=c[1];
+							break;
+						};
+					};
+					// console.log(str,str.length)
+					// console.log(_data,_data.length)
+					//書き込み失敗
+					if(str.length>_data.length){
+						_cb(false);
+					}else{//書き込みOK
+						_cb(true);
+					}
+
+				},100)
+				
+			};
+
+			function _getAryStr(_ary){
+				var s=''
+				for(var i=0;i<_ary.length;i++){
+					var o=_ary[i]
+					s += o.dasid +','
+					if(o.in){
+						s += o.in +','
+					}else{
+						s += ','
+					}
+					if(o.out){
+						s += o.out
+					}else{
+						//s += ','
+					}
+					s += '|'
+				}
+				return s.substr(0,s.length-1)
+			}
+
+		}
+	
+	}
+
+
+};
+
+
+var g_playlist_print={
+	control:null
+	,init:function(){
+		var _this=this;
+		_this.control=school_playlist_control
+		var dasAry=null;
+		var _q=_this.getSearchObj();
+		if(_q.hasOwnProperty('listname')){
+			dasAry=[]
+			var _listname=decodeURI(_q['listname'])
+			var listObj=_this.control.getLocalList(_listname);
+			for(var i=0;i<listObj.items.length;i++){
+				dasAry.push(listObj.items[i].dasid)
+			}
+			if(dasAry.length){
+				
+				g_school_util.getDasInfo(dasAry,function(_data){
+					if(_data && _data.response.records){
+						var ary=_data.response.records
+						var orgItems=listObj.items
+						//responsに含まれないものがあるので、DASIDを比較して元配列へ格納
+						for(var i=0;i<orgItems.length;i++){
+							var newItem=_getInfoObj(ary,orgItems[i])
+							if(newItem){
+								orgItems[i]=newItem;
+							};
+						};
+						_this.viewList(orgItems);
+					}
+				});
+				if(_listname=='history'){
+					_listname='りれき';
+				}
+				//$('#historyTitle').html(_title)
+				var icon='<span class="icon"><img src="../parts2015/playlist/img/icon_mylist_selected.png"></span>'
+				$('.printMenu').eq(0).prepend('<h2 class="listName">'+icon+_listname+'</h2>')
+				$('.printBtn').off().on('click',function(){
+					window.print();
+					return false;
+				})
+			}else{
+				//console.log('no-list')
+			};
+
+		}else{
+			//console.log('no-list')
+		};
+
+		function _getInfoObj(_result,_o){
+			for(var i=0;i<_result.length;i++){
+				var _r = _result[i];
+				if(_r.dasId == _o.dasid){
+					_r.dasid=_o.dasid;
+					_r.in=_o.in;
+					_r.out=_o.out;
+					return  _r;
+				};
+			};
+			return false;
+		};	
+	}
+	
+	,getLink:function(_o,_type){
+		var _conf=sclconfig
+		var _u=_conf.nhkCgiTop+'school/movie/';
+		var _dasid = _o.dasid || _o.dasId
+		//clip
+		if(_dasid.substr(4,2)=='53' ||_dasid.substr(4,2)=='54'){
+			_u+='clip.cgi?das_id='+_dasid;
+			if(_type=='box'){
+				_u+='&p=box';
+			};
+		//番組
+		}else{
+			_u+='bangumi.cgi?das_id='+_dasid;
+			if(_type=='box'){
+				_u+='&p=box';
+			};
+		};
+
+		if(_o.in && _o.in.length && _o.out && _o.out.length){
+			_u+='#in='+_o.in+'&out='+_o.out
+		}
+
+		return _u;
+	}
+	,viewList:function(_list){
+		var _this=this;
+		var $parent=$('#commonItems .inner');
+		for(var i=0;i<_list.length;i++){
+			var $item=_getItem(_list[i],i);
+			$parent.append($item);
+		};
+
+		function _getItem(_o,_n){
+			var $item=$('<div />').addClass('item');
+			var $img=$('<img />').attr({'src':g_school_util.getDasImgSrc(_o)})
+			$item.html($img);
+			var _u='https:'+_this.getLink(_o,'normal');
+			var $detail=$('<div />').addClass('detail');
+			var $url=$('<span class="url"><a href="'+_u+'" target="_blank">'+_u+'</a></span>')
+			var sub=_o.subTitle
+			if(sub.length){sub='<br>'+sub}
+			var $title=$('<span class="text" />').html('<a href="'+_u+'" target="_blank">'+_o.title + sub +'</a>').append($url);
+
+			//title+='<span class="url" style="width:75%;float:left;font-size:80%;"><a href="'+_u+'" target="_blank">'+_u+'</a></span>';
+			$detail.html('<span class="num">'+(_n+1)+'</span>').append($title);
+			$detail.qrcode({width: 500, height: 500, text:_u});
+			$item.append($detail)
+			return $item;
+		};
+
+	}
+
+	,getSearchObj:function(){
+		var _obj=false;
+		var _sc=window.location.search;
+		
+		if(_sc.length){
+			_obj={};
+			_sc=_sc.substr(1,_sc.length)
+			var _ary=_sc.split('&');
+			for(var i=0;i<_ary.length;i++){
+				var _o=_ary[i].split('=')
+				_obj[_o[0]]=_o[1]
+			}
+		}
+		
+		return _obj;
+	}
+
+};

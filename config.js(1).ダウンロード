@@ -1,0 +1,315 @@
+var sclconfig = {
+	"dir":'/school/',
+  "wdir":'//www.nhk.or.jp/school/',
+  "cdir":'//www2.nhk.or.jp/school/',
+	"bangumi":{
+		"rika":'//www.nhk.or.jp/rika/'
+		,"syakai":'//www.nhk.or.jp/syakai/'
+		,"kokugo":'//www.nhk.or.jp/kokugo/'
+		,"sansuu":'//www.nhk.or.jp/sansuu/'
+		,"seikatsu":'//www.nhk.or.jp/seikatsu/'
+		,"doutoku":'//www.nhk.or.jp/doutoku/'
+		,"ongaku":'//www.nhk.or.jp/ongaku/'
+		,"taiiku":'//www.nhk.or.jp/taiiku/'
+		,"zukou":'//www.nhk.or.jp/zukou/'
+		,"gijutsu":'//www.nhk.or.jp/gijutsu/'
+		,"katei":'//www.nhk.or.jp/katei/'
+		,"sougou":'//www.nhk.or.jp/sougou/'
+		,"eigo":'//www.nhk.or.jp/eigo/'
+		,"tokkatsu":'//www.nhk.or.jp/tokkatsu/'
+		,"tokushi":'//www.nhk.or.jp/tokushi/'
+		,"cdir":'//www2.nhk.or.jp/school/'
+		,"crika":'//www2.nhk.or.jp/rika/'
+		,"csyakai":'//www2.nhk.or.jp/syakai/'
+		,"ckokugo":'//www2.nhk.or.jp/kokugo/'
+		,"csansuu":'//www2.nhk.or.jp/sansuu/'
+		,"cseikatsu":'//www2.nhk.or.jp/seikatsu/'
+		,"cdoutoku":'//www2.nhk.or.jp/doutoku/'
+		,"congaku":'//www2.nhk.or.jp/ongaku/'
+		,"ctaiiku":'//www2.nhk.or.jp/taiiku/'
+		,"czukou":'//www2.nhk.or.jp/zukou/'
+		,"cgijutsu":'//www2.nhk.or.jp/gijutsu/'
+		,"ckatei":'//www2.nhk.or.jp/katei/'
+		,"csougou":'//www2.nhk.or.jp/sougou/'
+		,"ceigo":'//www2.nhk.or.jp/eigo/'
+		,"ctokkatsu":'//www2.nhk.or.jp/tokkatsu/'
+		,"ctokushi":'//www2.nhk.or.jp/tokushi/'
+	},
+  "nhkTop":    "//www.nhk.or.jp/",
+  "nhkCgiTop": "//www2.nhk.or.jp/",
+  "api": {
+    "keyword" :  "//www2.nhk.or.jp/school/api4/keyword.cgi",
+    "guideline": "//www2.nhk.or.jp/school/api4/guideline.cgi",
+    "clip":      "//www2.nhk.or.jp/school/api4/clip.cgi",
+    "game":      "//www2.nhk.or.jp/school/api4/game.cgi",
+    "recommend": "//www2.nhk.or.jp/school/api4/recommend.cgi",
+    "movie": {
+      "bangumi":     "//www2.nhk.or.jp/school/api4/movie/bangumi.cgi",
+      "clip":        "//www2.nhk.or.jp/school/api4/movie/clip.cgi",
+      "cliplist":    "//www2.nhk.or.jp/school/api4/movie/cliplist.cgi",
+      "bangumiList": "//www2.nhk.or.jp/school/api4/movie/bangumi_list.cgi"
+    },
+    "sukudo": {
+      "kanren": "//www2.nhk.or.jp/school/api4/sukudo/kanren.cgi"
+    }
+  },
+  "program": {
+    "json":  "/school/home_onair.json",
+    "limit": "2017-04-01"
+  },
+  "clip": {
+    "url": "//www2.nhk.or.jp/school/movie/clip.cgi"
+  },
+  "outline": {
+    "url": "//www2.nhk.or.jp/school/movie/outline.cgi"
+  },
+  "bangumiTop": {
+    "jsonPath": "./cms_common/json/",
+    "slider": {
+      "clip": {
+        "imgWidth": 180,
+        "imgHeight": 101
+      },
+      "other": {
+        "imgWidth": 128,
+        "imgHeight": 72
+      }
+    }
+  },
+  "recommendStamp": {
+    "cookie":{
+      "domain": ".nhk.or.jp",
+      "expires": 604800
+    }
+  },
+  "keyword": "//www.nhk.or.jp/school/keyword/",
+  "SNSButton": {
+    "redirectUrl":  "//www2.nhk.or.jp/school/movie/",
+    "nhkSocialCGI": "//www2.nhk.or.jp/common/social/social.cgi",
+    "social": ["twitter", "facebook", "mixi", "google", "hatena", "help"],
+    "item": {
+      "twitter": {
+        "flag"   : "t",
+        "prefix" : "social_ts",
+        "icon"   : "//www.nhk.or.jp/common/social/img/s_twitter.png"
+      },
+      "facebook": {
+        "flag"    : "f",
+        "prefix"  : "social_fs",
+        "icon"    : "//www.nhk.or.jp/common/social/img/s_facebook.png"
+      },
+      "mixi": {
+        "flag"    : "m",
+        "prefix"  : "social_ms",
+        "icon"    : "//www.nhk.or.jp/common/social/img/s_mixi.png"
+      },
+      "google": {
+        "flag"   : "g",
+        "prefix" : "social_gs",
+        "icon"   : "//www.nhk.or.jp/common/social/img/google.png"
+      },
+      "hatena": {
+        "flag"   : "h",
+        "prefix" : "hatena_hs",
+        "icon"   : "//www.nhk.or.jp/common/social/img/hatena.png"
+      }
+    }
+  },
+  "catList": ["b", "c", "t"],
+  // "catList": ["b", "c", "g", "d", "s", "t"],
+ "cat": {
+    "b": {
+      "name": "ばんぐみ",
+      "key" : "bangumi"
+    },
+    "c": {
+      "name": "クリップ",
+      "key" : "clip"
+    },
+    // "g": {
+    //   "name": "クイズ・プレイ",
+    //   "key" : "game"
+    // },
+    // "d": {
+    //   "name": "電子黒板",
+    //   "key" : "dcontent"
+    // },
+    // "s": {
+    //   "name": "しりょう",
+    //   "key" : "shiryou"
+    // },
+    "t": {
+      "name": "先生向け",
+      "key" : "teacher"
+    }
+  },
+  "kyokaList": ["rika", "syakai", "kokugo", "sansuu", "seikatsu","doutoku", "ongaku", "taiiku", "zukou", "gijutsu", "katei", "sougou", "eigo", "tokkatsu", "tokushi", "youho"],
+  "kyoka": {
+    "rika"     : "理科",
+    "syakai"   : "社会",
+    "kokugo"   : "国語",
+    "sansuu"   : "算数",
+    "seikatsu" : "生活",
+    "doutoku"  : "道徳",
+    "ongaku"   : "音楽",
+    "taiiku"   : "体育",
+    "zukou"    : "図工",
+    "gijutsu"  : "技術",
+    "katei"    : "家庭",
+    "sougou"   : "総合",
+    "eigo"     : "英語",
+    "tokkatsu" : "特活",
+    "tokushi"  : "特支",
+    "youho"    : "幼保",
+  },
+  "extendKyoka": ["extend"],
+  "extendKyokaList": {
+    "extend" : "高校講座",
+  },
+  "gradeList": ["g1", "g2", "g3", "g4", "g5", "g6", "g7", "g0"],
+  "grade": {
+    "g1": {
+      "name"   : "小1",
+      "search" : ["小学","1年"]
+    },
+    "g2": {
+      "name"  : "小2",
+      "search": ["小学","2年"]
+    },
+    "g3": {
+      "name"  : "小3",
+      "search": ["小学","3年"]
+    },
+    "g4": {
+      "name"  : "小4",
+      "search": ["小学","4年"]
+    },
+    "g5": {
+      "name"  : "小5",
+      "search": ["小学","5年"]
+    },
+    "g6": {
+      "name"  : "小6",
+      "search": ["小学","6年"]
+    },
+    "g7": {
+      "name"  : "中学・高校",
+      "search": ["中学"]
+    },
+    "g0": {
+      "name"  : "幼保",
+      "search": ["幼保"]
+    }
+  },
+
+  "message": {
+    "result0": "ご指定の条件では検索結果が見つかりませんでした。",
+    "fail":    "メニューから目的のコンテンツを選んでもう一度お試しください。",
+    "zero":    "検索結果はありませんでした。検索条件を変更して再度お試しください。",
+    "error":   "現在このページは準備中です。大変お手数ですが準備中につき、いましばらくお待ちください。",
+    "timeout": "サーバーからの応答が遅れています。回線速度の低下、アクセスの集中などが考えられます。しばらく時間をおいてお試し下さい。",
+  },
+  "cookiedomain": ".nhk.or.jp",
+  "fancyboxOption": {
+    "type":      "iframe",
+    "width":     990,
+    "height":    800,
+    "speedIn":   200,
+    "speedOut":  200,
+    "scrolling": "no",
+    "showCloseButton": true,
+    "overlayColor":   "#FFF",
+    "overlayOpacity": "0.5",
+    "onComplete":function(){
+
+      var $frame= $('#fancybox-frame')
+      $frame.off().on('load',function(){
+        var _h=$frame.contents().find('#movie').height()
+        $frame.parent('div').height(_h)
+      }).attr('allowfullscreen', 'allowfullscreen');
+    }
+  },
+  "isPC":       false,
+  "deviceType": null,
+  "app": {
+    "ios": {
+      "key":    "ios",
+      "scheme": "",
+      "store":  "https://itunes.apple.com/jp/app/id1104138987",
+    },
+    "android": {
+      "key":     "android",
+      "scheme":  "",
+      "package": "",
+      "store":   "https://play.google.com/store/apps/details?id=jp.or.nhk.school",
+    }
+  },
+	"grade_menu_en": {
+	  	"all":"All",
+		"g1":"ES1",
+		"g2":"ES2",
+		"g3":"ES3",
+		"g4":"ES4",
+		"g5":"ES5",
+		"g6":"ES6",
+		"g7":"JH/HS",
+		"g0":"Kindergarten"
+	},
+  	"kyoka_menu_en": {
+ 		"all":"All",
+ 		"rika"     : "Science",
+  		"syakai"   : "Social Studies",
+  		"kokugo"   : "Japanese Language",
+  		"sansuu"   : "Math",
+   		"seikatsu"   : "Living Environment Studies",
+ 		"doutoku"  : "Morals",
+  		"ongaku"   : "Music",
+  		"taiiku"   : "Sports",
+  		"zukou"    : "Art",
+  		"gijutsu"  : "Tech",
+  		"katei"    : "Domestic Science",
+  		"sougou"   : "Intergrated Learning",
+  		"eigo"     : "English Language",
+  		"tokkatsu" : "Special Activities",
+  		"tokushi"  : "Special Support",
+  		"youho"    : "Kindergarten",
+  		"various":"Music, Sports, Art, Tech, Domestic Science",
+  		"other":"Others"
+  	},
+ 	LANGUAGE_COOKIE_NAME:'nol_school_lang',
+	LANGUAGE:{EN:'en',JA:'ja'}
+};
+
+// setting for brower
+$(function() {
+  var appConf = sclconfig.app;
+  var ua   = navigator.userAgent.toLowerCase();
+  sclconfig.deviceType = 'other';
+
+  if (ua.search(/iphone|ipad|ipod/) > -1 || (ua.indexOf('macintosh') > -1 && 'ontouchend' in document)) {
+    sclconfig.deviceType = appConf.ios.key;
+  } else if(ua.search(/android/) > -1) {
+    sclconfig.deviceType = appConf.android.key;
+  } else {
+    sclconfig.isPC = true;
+    // hight for hide APP banner
+    sclconfig.fancyboxOption.height = 620;
+  }
+  // add height for HLS Flash Mode
+  if (window.cookie_func && window.cookie_func.get) {
+    var ck = window.cookie_func.get('nol_school_player');
+    if (ck && ck == 1) {
+      sclconfig.fancyboxOption.height += 50;
+    }
+  }
+});
+
+
+for(var p in sclconfig.bangumi){
+  sclconfig[p]=sclconfig.bangumi[p];
+};
+
+var schoolConfig=sclconfig;
+
+
+//document.domain = 'nhk.or.jp';

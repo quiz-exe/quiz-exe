@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="82" height="82" viewBox="0 0 82 82">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+        fill-opacity: 0.9;
+        stroke: #e6e6e6;
+        stroke-width: 1px;
+      }
+
+      .cls-2 {
+        fill: #585858;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <rect id="長方形_1184" data-name="長方形 1184" class="cls-1" x="1" y="1" width="80" height="80" rx="10" ry="10"/>
+  <path id="icn_arrow" class="cls-2" d="M39.084,31.7L29.634,46.09A1.877,1.877,0,0,0,31.193,49h18.9a1.877,1.877,0,0,0,1.559-2.912L42.2,31.7A1.863,1.863,0,0,0,39.084,31.7Z"/>
+</svg>

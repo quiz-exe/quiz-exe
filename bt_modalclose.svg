@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #66af54;
+      }
+
+      .cls-2 {
+        fill: #fff;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <circle id="楕円形_10" data-name="楕円形 10" class="cls-1" cx="25" cy="25" r="25"/>
+  <path id="icn_close" class="cls-2" d="M27.836,25.008l6.01,6.01a2,2,0,1,1-2.828,2.828l-6.01-6.01L19,33.847a2,2,0,0,1-2.828-2.828l6.011-6.01L16.169,19A2,2,0,0,1,19,16.169l6.011,6.01,6.01-6.01A2,2,0,1,1,33.847,19Z"/>
+</svg>

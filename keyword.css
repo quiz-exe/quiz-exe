@@ -1,0 +1,269 @@
+
+#keyword main{
+    padding-top:0;
+}
+#schoolResultHeader{
+    background: #66af54;
+}
+#schoolResultHeader .commonSearch{
+    background: none;
+    color: #fff;
+}
+
+#schoolResultHeader .submit .btn a {
+
+
+}
+#schoolResultHeader .submit .btn a span::before{
+    margin:auto;
+    display: block;
+    text-align: center;
+    left:0;
+    width: 2em;height:1.5em;
+  
+    background:  url(../../common/img/icon_searchbtn_g.svg) no-repeat left center;
+    background-size: contain;
+    transform: none;
+}
+@media all and (min-width: 768px) {
+   .resutHead .resutTitle{
+       padding:3.906% 0;
+   }
+   #schoolResultHeader .commonSearch{
+      align-items: center;
+      /* justify-content: center; */
+}
+   #schoolResultHeader .commonSearch .keywordArea{
+       width:29.24%;
+    margin-right:10px;
+    padding:16px 0;
+   }
+   #schoolResultHeader .commonSearch .keywordArea .placeHolder{
+       top:16px;
+   }
+   
+   #schoolResultHeader .commonSearch .optionArea{
+    margin-top:0;
+   }
+   #schoolResultHeader .commonSearch .optionMenu {
+    /* width:90px; */
+    margin-right:10px;
+   }
+   #schoolResultHeader .commonSearch .gradeWrap,#schoolResultHeader .commonSearch .cat{
+    display: flex;
+   }
+   #schoolResultHeader .commonSearch .gradeWrap{
+    width:232px;
+    margin-right:10px;
+}
+#schoolResultHeader .submit{
+    margin:12px 0;
+}
+   #schoolResultHeader .submit .btn a{
+        font-size: 18px;
+        padding: 12px 12px 10px 12px
+
+    }
+    #schoolResultHeader .submit .btn a span{
+        padding-left: 26px;
+        letter-spacing:2px;
+    }
+    #schoolResultHeader .submit .btn a span::before{
+        background-size: contain;
+        background-position: left center;
+        width:24px;height:24px;
+    }
+
+}
+
+@media screen and (max-width: 767px) {
+    .resutHead{
+        padding:6.66% 0 4%;
+    }
+
+    #schoolResultHeader {background: linear-gradient(#6db55b, #5fab4c);}
+
+    #schoolResultHeader .menusearch>.inner{
+       max-width: none;
+       width:92%;
+    }
+    #schoolResultHeader .commonSearch{
+        padding:5.33% 0 4.76%;
+        min-width: auto;
+        width: 100%;
+    }
+
+    #schoolResultHeader .keywordArea{
+        border: 1px solid #c7e8bf;
+        background: #fff;
+        border-radius: 6px;
+        padding:0;
+        width:100%;
+        margin:0 auto 4.34%;
+        height:auto;
+    }
+
+   
+    #schoolResultHeader input[type="text"]{
+        padding:3.34% 0;
+        font-size:3.73vw;
+        height:auto;
+        text-indent: 0.5em;
+       color:#000;
+    }
+    #schoolResultHeader input[type="button"]{
+        top:3px;right:3px;
+        width:14.28%;height:80%;
+        border-radius:0 4px 4px 0/ 0 4px 4px 0 ;
+        background-size: 50%;
+    }
+
+
+    #schoolResultHeader .placeHolder{
+        display: none;
+    }
+    #schoolResultHeader .title{
+        color: #fff;
+    }
+    #schoolResultHeader .commonSearch .optionArea{
+        width:100%;
+        padding:0;
+        margin-bottom:0;
+     }
+
+    #schoolResultHeader .commonSearch .optionMenu {
+        width: auto;
+        position: static;
+        margin: 0 1em 0 0;
+        width:33.33%;
+    }
+
+    #schoolResultHeader .commonSearch .optionMenu *{
+        font-size:3.73vw;
+    }
+    #schoolResultHeader .commonSearch .optionMenu:last-child{
+     margin-right: 0;
+    }
+    #schoolResultHeader .commonSearch .optionMenu > li {
+     width:100%;
+    }
+    #schoolResultHeader .commonSearch .optionMenu > li strong span{
+        display: block;
+         padding:4px 10px 4px 0;
+         font-weight: bold ;
+    }
+    #schoolResultHeader .commonSearch .optionMenu li > ul.toggleMenu{
+         top:auto;
+         z-index: 8;
+         left:0;right:0;margin:15px auto 0;
+     }
+     #schoolResultHeader .commonSearch .optionMenu li.subject > ul.toggleMenu:before{
+         left:26%;
+     }
+     #schoolResultHeader .commonSearch .optionMenu li.grade > ul.toggleMenu:before{
+         left:83%;
+     }
+
+ 
+
+    /* cat */
+    /* 動画の種類 */
+    /* cat checkbox*/
+    #schoolResultHeader .cat input {
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        appearance: none;
+        border-radius: 0;
+        border: 0;
+        margin: 0;
+        padding: 0;
+        background: none transparent;
+        vertical-align: middle;
+        font-size: inherit;
+        color: inherit;
+        box-sizing: content-box;
+        display:none
+    }
+    #schoolResultHeader .cat label {
+        position: relative;
+        display: block;
+        padding: 0 0 0 1.8em;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        color:#fff;
+    }
+    #schoolResultHeader .cat label:before {
+        position: absolute;
+        content: "";
+        display: block;
+        top: .05em;
+        left: .4em;
+        width: .5em;
+        height: .65em;
+        border-right: 3px solid #ffab51;
+        border-bottom: 3px solid #ffab51;
+        -webkit-transform: rotate(45deg);
+        transform: rotate(45deg);
+        opacity: 0;
+        z-index: 1;
+    }
+    #schoolResultHeader .cat label:after {
+        position: absolute;
+        content: "";
+        display: block;
+        top: .05em;
+        left: 0;
+        width: 1em;
+        height: 1em;
+        background: #fff;
+        border: 2px solid #63ac55;
+        border-radius: 4px;
+    }
+    #schoolResultHeader .cat input[type=checkbox]:checked+label:before {
+        opacity:1
+    }
+
+  
+     #schoolResultHeader .gradeWrap {
+         font-size:3.73vw;
+         margin:0 auto 4.34%;
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+     }
+ 
+     
+     #schoolResultHeader .gradeWrap .selectMenu{
+         width:26.6vw;
+         font-size:3.73vw;
+         padding:0.75em 0.5em;
+     }
+     #schoolResultHeader .cat {
+         font-size:3.73vw;
+         margin:0 auto 4.34%;
+         padding-bottom:4.34%;
+         border-bottom:1px solid #75c465;
+     }
+     #schoolResultHeader .cat>div{
+        display: inline-block;
+        vertical-align: middle;
+         margin-right:4px;
+     }
+     #schoolResultHeader .submit{
+         width: 100%;
+     }
+     #schoolResultHeader .submit .btn a{
+         padding:16px 0 14px 0;
+         width:43.47%;
+     }
+     #schoolResultHeader .submit .btn a span{
+         padding-left:1.7em;
+         letter-spacing:2px;
+         font-size: 1.25rem;
+
+     }
+     #schoolResultHeader .submit .btn a span::before{
+        background-position: left center;
+     }
+
+}

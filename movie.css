@@ -1,0 +1,738 @@
+@media screen and (min-width: 768px) {
+  html.noScroll {
+    overflow: hidden; } }
+
+/*mainContents*/
+main {
+  overflow: hidden; }
+
+#mainContents {
+  position: relative; }
+  #mainContents:after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: -50%;
+    width: 200%;
+    height: 8px;
+    background: #f1f1f1; }
+  #mainContents .movie {
+    padding-bottom: 3.96%; }
+    #mainContents .movie .movieWrap {
+      width: 100%;
+      position: relative;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
+      min-height: 600px;
+      -ms-flex-line-pack: start;
+          align-content: flex-start; }
+  #mainContents #moviePlayer {
+    width: 57.617%;
+    -webkit-box-ordinal-group: 1;
+        -ms-flex-order: 0;
+            order: 0;
+    /* flex-basis: 57.617%;  */ }
+  #mainContents #movieChapter {
+    -webkit-box-ordinal-group: 2;
+        -ms-flex-order: 1;
+            order: 1;
+    width: 42.38%; }
+    #mainContents #movieChapter .chapterWrap {
+      overflow-y: scroll;
+      position: relative;
+      height: 89.87%;
+      -webkit-overflow-scrolling: auto; }
+      #mainContents #movieChapter .chapterWrap .chapterWrapScroll {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%; }
+    #mainContents #movieChapter .chapterTitle {
+      padding: 10px 14px;
+      font-size: 16px;
+      background-color: #66af54;
+      color: #fff;
+      font-weight: bold;
+      position: relative; }
+      #mainContents #movieChapter .chapterTitle a {
+        color: #fff;
+        font-size: 14px;
+        height: 1.4em;
+        position: absolute;
+        right: 1em;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        background: url(../../common/img/icon_link_w.svg) no-repeat left center;
+        background-size: 12px;
+        padding-left: 1.4em; }
+    #mainContents #movieChapter .chapterItem {
+      margin-top: 2.3%; }
+      #mainContents #movieChapter .chapterItem .inner {
+        width: 95.4%;
+        margin: 0 auto;
+        padding: 2.764% 2.764% 0;
+        background: #f1f1f1;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box; }
+        #mainContents #movieChapter .chapterItem .inner .scene {
+          padding: 10px;
+          margin-bottom: 3.78%;
+          cursor: pointer;
+          background: #fff;
+          border-radius: 6px;
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box; }
+          #mainContents #movieChapter .chapterItem .inner .scene .thumb {
+            width: 34.59%;
+            margin-right: 2.3%;
+            display: inline-block;
+            vertical-align: top; }
+            #mainContents #movieChapter .chapterItem .inner .scene .thumb img {
+              width: 100%; }
+          #mainContents #movieChapter .chapterItem .inner .scene .cpTitle {
+            width: 61.4%;
+            display: inline-block;
+            vertical-align: top;
+            font-weight: bold; }
+            #mainContents #movieChapter .chapterItem .inner .scene .cpTitle span {
+              display: block;
+              color: #66af54; }
+        #mainContents #movieChapter .chapterItem .inner .summary {
+          padding: 0 2.3%; }
+          #mainContents #movieChapter .chapterItem .inner .summary p {
+            height: 0;
+            overflow: hidden; }
+          #mainContents #movieChapter .chapterItem .inner .summary .viewBtn {
+            display: inline-block;
+            color: #66af54;
+            font-weight: bold;
+            position: relative;
+            padding-left: 1.5em;
+            line-height: 1;
+            cursor: pointer;
+            margin-bottom: 3.78%; }
+            #mainContents #movieChapter .chapterItem .inner .summary .viewBtn::before {
+              content: '';
+              display: block;
+              position: absolute;
+              left: 0;
+              top: 0;
+              bottom: 0;
+              margin: auto;
+              background-image: url(/school/common/img/icon_viewopen.svg);
+              background-repeat: no-repeat;
+              background-position: left top;
+              background-size: contain;
+              width: 16px;
+              height: 16px; }
+          #mainContents #movieChapter .chapterItem .inner .summary.open p {
+            height: auto;
+            padding-bottom: 3.78%; }
+          #mainContents #movieChapter .chapterItem .inner .summary.open .viewBtn::before {
+            background-image: url(/school/common/img/icon_viewclose.svg); }
+      #mainContents #movieChapter .chapterItem.active .inner {
+        background: #eef7ec;
+        border: 2px solid #c7e8bf; }
+  #mainContents #movieDetail {
+    -webkit-box-ordinal-group: 4;
+        -ms-flex-order: 3;
+            order: 3;
+    /* width:74.21%; */
+    width: calc(100% - 270px);
+    padding-top: 2.92%;
+    position: relative; }
+    #mainContents #movieDetail .onair {
+      color: #66af54;
+      font-size: 14px;
+      margin-bottom: 1.953%; }
+    #mainContents #movieDetail .title {
+      font-weight: bold;
+      font-size: 26px;
+      margin-bottom: 2.34%; }
+    #mainContents #movieDetail .summary {
+      font-size: 14px;
+      margin-bottom: 2.34%; }
+    #mainContents #movieDetail .summaryLink {
+      margin-bottom: 2.34%; }
+      #mainContents #movieDetail .summaryLink a {
+        font-size: 16px;
+        padding-top: 1.1em;
+        padding-bottom: 0.8em; }
+  #mainContents #movieKeyword {
+    width: calc(100% - 270px);
+    -webkit-box-ordinal-group: 5;
+        -ms-flex-order: 4;
+            order: 4; }
+    #mainContents #movieKeyword span {
+      display: inline-block;
+      border: 1px solid #d4ebcf;
+      border-radius: 4px;
+      padding: 0.2em 0.5em;
+      margin: 0 6px 6px 0; }
+      #mainContents #movieKeyword span a {
+        color: inherit; }
+  #mainContents #movieShare {
+    -webkit-box-ordinal-group: 4;
+        -ms-flex-order: 3;
+            order: 3;
+    /* width: 22.07%; */
+    width: 226px;
+    margin: 2.92% 0 0 3.5%;
+    position: relative; }
+    #mainContents #movieShare .bdWrap {
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      border-radius: 20px;
+      border: 6px solid #f1f1f1;
+      padding: 13.2% 9.2% 13.2%;
+      position: absolute; }
+      #mainContents #movieShare .bdWrap .linkBtn a {
+        background-image: url(../img/btn_snscopy_pc.png);
+        background-size: contain;
+        width: 100%;
+        height: 51px;
+        display: block;
+        background-repeat: no-repeat;
+        background-position: left top;
+        text-indent: -500%;
+        overflow: hidden; }
+      #mainContents #movieShare .bdWrap::before {
+        display: block;
+        content: '';
+        position: absolute;
+        background: #fff;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        width: 18px;
+        height: 18px;
+        border-bottom: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid #f1f1f1;
+        border-left: 6px solid #f1f1f1;
+        margin-left: -15px;
+        -webkit-transform: rotate(-45deg);
+                transform: rotate(-45deg); }
+
+.movieModal #mainContents {
+  padding: 0; }
+  .movieModal #mainContents #movieDetail, .movieModal #mainContents #movieKeyword {
+    padding-left: 2.92%;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box; }
+  .movieModal #mainContents #movieShare {
+    margin-left: 1.6%; }
+
+.noVideo img {
+  width: 100%; }
+
+#linkBtn {
+  background-color: #eef7ec;
+  padding: 20px 0 24px 0; }
+  #linkBtn a.cbtn {
+    font-size: 16px;
+    padding: 0.8em 1.8em; }
+
+.capCaution {
+  margin: -2% 0 2% 0;
+  font-size: 3.73vw;
+  color: #cc0000; }
+
+#programContents {
+  padding: 60px 10px 30px; }
+
+section.clip, section.kyozai, section.relationlink {
+  border-top: 2px dotted #e5e5e5 !important; }
+  section.clip h4, section.kyozai h4, section.relationlink h4 {
+    font-size: 20px;
+    margin: 20px 0 15px 0; }
+
+@media screen and (max-width: 767px) and (orientation: portrait) {
+  #mainContents {
+    padding-bottom: 5.33%; }
+    #mainContents .movie .movieWrap {
+      width: 92%;
+      margin: auto;
+      position: relative;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap; }
+    #mainContents #moviePlayer {
+      -webkit-box-ordinal-group: 1;
+          -ms-flex-order: 0;
+              order: 0;
+      width: 100%;
+      margin-bottom: 5.33%; }
+    #mainContents #movieChapter {
+      -webkit-box-ordinal-group: 3;
+          -ms-flex-order: 2;
+              order: 2;
+      margin-bottom: 3.478%;
+      width: 100%; }
+      #mainContents #movieChapter .chapterWrap {
+        overflow-y: visible;
+        height: auto; }
+        #mainContents #movieChapter .chapterWrap .chapterWrapScroll {
+          position: relative; }
+      #mainContents #movieChapter .chapterTitle {
+        font-size: 4.26vw;
+        padding: 3.2% 5.33%; }
+        #mainContents #movieChapter .chapterTitle a {
+          display: none; }
+      #mainContents #movieChapter .chapterItem:first-child {
+        margin-top: 2.3%; }
+      #mainContents #movieChapter .chapterItem .inner {
+        margin: 2.3% 0;
+        padding: 3.478% 3.478% 0;
+        width: 100%; }
+        #mainContents #movieChapter .chapterItem .inner .scene {
+          padding: 3.1%;
+          margin-bottom: 3.478%; }
+          #mainContents #movieChapter .chapterItem .inner .scene .thumb {
+            width: 19.84%;
+            margin-right: 2.17%; }
+          #mainContents #movieChapter .chapterItem .inner .scene .cpTitle {
+            width: 71.3%;
+            font-size: 3.73vw;
+            line-height: 1.4; }
+            #mainContents #movieChapter .chapterItem .inner .scene .cpTitle span {
+              font-size: 3.2vw; }
+        #mainContents #movieChapter .chapterItem .inner .summary {
+          font-size: 3.73vw;
+          padding: 0 1.2%; }
+          #mainContents #movieChapter .chapterItem .inner .summary.open p {
+            padding-bottom: 3.478%; }
+          #mainContents #movieChapter .chapterItem .inner .summary .viewBtn {
+            margin-bottom: 3.478%;
+            padding-left: 1.5em; }
+            #mainContents #movieChapter .chapterItem .inner .summary .viewBtn::before {
+              width: 1.2em;
+              height: 1.2em; }
+    #mainContents #movieDetail {
+      -webkit-box-ordinal-group: 2;
+          -ms-flex-order: 1;
+              order: 1;
+      margin-bottom: 5.33%;
+      width: 100%; }
+      #mainContents #movieDetail .onair {
+        font-size: 3.73vw;
+        margin-bottom: 1.953%; }
+      #mainContents #movieDetail .title {
+        font-size: 4.26vw;
+        margin-bottom: 2.34%; }
+      #mainContents #movieDetail .summary {
+        font-size: 3.73vw;
+        margin-bottom: 2.34%; }
+      #mainContents #movieDetail .summaryLink {
+        margin-bottom: 2.34%; }
+    #mainContents #movieKeyword {
+      -webkit-box-ordinal-group: 4;
+          -ms-flex-order: 3;
+              order: 3;
+      font-size: 3.73vw;
+      margin-bottom: 5.33%;
+      font-weight: bold;
+      width: 100%; }
+      #mainContents #movieKeyword span {
+        margin: 8px 8px 0 0; }
+    #mainContents #movieShare {
+      -webkit-box-ordinal-group: 5;
+          -ms-flex-order: 4;
+              order: 4;
+      width: 100%;
+      position: relative;
+      margin: 0 0 5.33% 0;
+      text-align: center; }
+      #mainContents #movieShare .bdWrap {
+        border-radius: 12px;
+        padding: 4.34% 0;
+        font-size: 4.26vw;
+        position: relative; }
+        #mainContents #movieShare .bdWrap::before {
+          display: none; }
+        #mainContents #movieShare .bdWrap .nhksns-guide {
+          margin-bottom: 0;
+          line-height: 1.5; }
+        #mainContents #movieShare .bdWrap .nhksns-icon-s img {
+          width: 32px;
+          vertical-align: middle; }
+        #mainContents #movieShare .bdWrap .linkBtn a {
+          background-image: url(../img/btn_snscopy_sp.png);
+          background-size: contain;
+          width: 75.78%;
+          height: 12vw;
+          margin: auto; }
+  section.clip,
+  section.kyozai, section.relationlink {
+    padding-bottom: 8%; }
+  #programContents {
+    padding: 8% 0 5.33%; }
+  #linkBtn {
+    padding: 20px 0 24px 0;
+    width: 92%;
+    margin: -20px auto 0; }
+    #linkBtn a.cbtn {
+      font-size: 3.73vw;
+      padding: 0.8em 1.8em; } }
+
+@media screen and (orientation: landscape) {
+  .uaSP #movieDetail {
+    width: calc(100% - 300px); }
+  .uaSP #movieKeyword {
+    font-size: 14px;
+    font-weight: bold; }
+    .uaSP #movieKeyword span {
+      margin: 8px 8px 0 0; }
+  .uaSP #movieShare {
+    width: calc(256px); } }
+
+/*-- modal sp --*/
+.SP.movieModal {
+  background: none; }
+  .SP.movieModal #commonContainer {
+    background: none; }
+  .SP.movieModal.movie_fullscreen #commonContainer {
+    display: none; }
+  .SP.movieModal .movieWrap {
+    background: #fff; }
+
+@media screen and (max-width: 767px) and (orientation: portrait) {
+  .movieModal #movieDetail, .movieModal #movieChapter, .movieModal #movieKeyword, .movieModal #movieShare {
+    width: calc(630/690*100%);
+    margin-left: auto;
+    margin-right: auto; } }
+
+section.kyozai .contents,
+section.clip .contents {
+  overflow: hidden;
+  position: relative; }
+
+.itemList .title, .itemMaterial .title {
+  border-style: none;
+  font-size: 16px; }
+
+section.relationlink {
+  display: none; }
+  section.relationlink.show {
+    display: block; }
+
+.teacherMode .contents .itemMaterial.forTeacher:nth-child(n+5) {
+  display: none !important; }
+
+.teacherMode .contents.more-view .itemMaterial.forTeacher:nth-child(n+5) {
+  display: inline-block !important; }
+
+.contents .itemMaterial:nth-child(n+5), .contents .itemList:nth-child(n+5) {
+  display: none !important; }
+
+.contents .item {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  display: inline-block;
+  vertical-align: top;
+  width: calc(502/1024*100%);
+  margin-right: calc(20/1024*100%);
+  margin-bottom: calc(20/1024*100%); }
+  .contents .item:nth-child(2n) {
+    margin-right: 0; }
+  .contents .item a {
+    display: block;
+    color: inherit;
+    padding: calc(10/502*100%);
+    background-color: #f1f1f1; }
+  .contents .item .thumb {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    border: 1px solid #d7d7d7;
+    overflow: hidden;
+    width: calc(220/482*100%);
+    margin-right: calc(20/482*100%);
+    height: auto; }
+    .contents .item .thumb::after {
+      content: '';
+      display: block;
+      padding-bottom: 56.25%; }
+    .contents .item .thumb img {
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto; }
+  .contents .item .title {
+    display: inline-block;
+    vertical-align: top;
+    text-align: left;
+    position: relative;
+    padding-left: 18px;
+    padding-top: 4px;
+    line-height: 1.4;
+    font-weight: bold;
+    font-size: 1rem;
+    width: calc(214/482 * 100%); }
+    .contents .item .title::before {
+      display: block;
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 7px;
+      width: 16px;
+      height: 16px;
+      background: url(../../common/img/icon_arrow_school.svg) center center no-repeat;
+      background-size: 100%; }
+    .contents .item .title .blank {
+      height: 1.25em;
+      width: auto;
+      display: inline-block;
+      vertical-align: text-bottom;
+      margin-left: 4px; }
+
+.moreBtn {
+  border: 2px solid #c7e8bf;
+  border-radius: 6px;
+  width: 60%;
+  margin: auto;
+  text-align: center; }
+  .moreBtn a {
+    line-height: 1;
+    font-weight: bold;
+    display: block; }
+    .moreBtn a span {
+      position: relative;
+      padding-left: 1.2em; }
+      .moreBtn a span::before {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        left: 0;
+        content: '';
+        display: block;
+        background: url(../img/icon_more.svg) no-repeat left center;
+        background-size: contain;
+        width: 0.9em;
+        height: 0.9em; }
+  .moreBtn.ruby a {
+    padding-top: 1em !important;
+    padding-bottom: 0.8em !important; }
+  .moreBtn.close a span::before {
+    background-image: url(../img/icon_close.svg); }
+  .moreBtn.hide {
+    display: none; }
+
+@-webkit-keyframes itemview {
+  from {
+    opacity: 0; }
+  to {
+    opacity: 1; } }
+
+@keyframes itemview {
+  from {
+    opacity: 0; }
+  to {
+    opacity: 1; } }
+
+@media screen and (min-width: 768px) {
+  section.clip .inner, section.kyozai .inner {
+    padding-bottom: 2.92%; }
+  section.relationlink .inner {
+    padding-bottom: calc(60/1024*100%); }
+  .slider {
+    /* width:88.86%; */
+    margin: auto; }
+    .slider .itemList, .slider .itemMaterial {
+      width: 23.475%;
+      /* margin:  0 0.7625% ; */
+      margin: 0 4px;
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      display: inline-block; }
+    .slider .slider-navi.next {
+      margin-right: 0; }
+    .slider .slider-navi.prev {
+      margin-left: 0; }
+    .slider .slider-navi.slick-disabled {
+      visibility: hidden; }
+  .contents .itemMaterial, .contents .itemList {
+    width: calc(241/1024*100%);
+    margin: 0 calc(20/1024*100%) calc(20/1024*100%) 0;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    display: inline-block;
+    vertical-align: top; }
+  .contents .itemMaterial:nth-child(4n) {
+    margin-right: 0; }
+  .contents .itemList:nth-child(4n) {
+    margin-right: 0; }
+  .contents.more-view .itemMaterial:nth-child(n+5) {
+    display: inline-block !important;
+    -webkit-animation: itemview 0.5s linear 0s;
+            animation: itemview 0.5s linear 0s; }
+  .contents.more-view .itemList:nth-child(n+5) {
+    display: inline-block !important;
+    -webkit-animation: itemview 0.5s linear 0s;
+            animation: itemview 0.5s linear 0s; }
+  .teacherMode .itemMaterial.forTeacher {
+    display: inline-block !important; }
+  .moreBtn {
+    width: 154px; }
+    .moreBtn a {
+      font-size: 16px;
+      padding: 10px 0; } }
+
+@media screen and (min-width: 1160px) {
+  .slider .slider-navi.next {
+    margin-right: -5%; }
+  .slider .slider-navi.prev {
+    margin-left: -5%; }
+  .slider .slider-navi.slick-disabled {
+    visibility: visible; } }
+
+@media screen and (max-width: 767px) {
+  section.clip .inner, section.kyozai .inner, section.relationlink .inner {
+    width: 92%;
+    margin: auto; }
+  section.clip .contents {
+    margin-bottom: 2.66%;
+    position: relative; }
+    section.clip .contents .item-wrap {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap; }
+  section.clip .itemList {
+    width: 47.82%;
+    margin-right: 4.34%;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box; }
+    section.clip .itemList:nth-child(even) {
+      margin-right: 0; }
+    section.clip .itemList.hide {
+      display: none; }
+    section.clip .itemList:nth-child(n+5) {
+      display: none; }
+  section.kyozai .contents {
+    margin-bottom: 2.66%;
+    position: relative; }
+    section.kyozai .contents .item-wrap {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap; }
+  section.kyozai .itemMaterial {
+    width: 47.82%;
+    margin-right: 4.34%;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box; }
+    section.kyozai .itemMaterial:nth-child(even) {
+      margin-right: 0; }
+    section.kyozai .itemMaterial:nth-child(n+5) {
+      display: none; }
+  section .contents.more-view .itemMaterial:nth-child(n+5), section .contents.more-view .itemList:nth-child(n+5) {
+    display: block !important;
+    -webkit-animation: itemview 0.5s linear 0s;
+            animation: itemview 0.5s linear 0s; }
+  section .contents .item {
+    display: block;
+    width: 100%;
+    margin-bottom: calc(20/690*100%);
+    /* width: calc(320/1024*100%);
+                    margin-right: calc(32/1024*100%); */ }
+    section .contents .item:last-child {
+      margin-bottom: 0; }
+    section .contents .item a {
+      padding: calc(20/690*100%); }
+    section .contents .item .thumb {
+      width: calc(288/690*100%);
+      margin-right: calc(20/690*100%); }
+    section .contents .item .title {
+      width: calc(336/690*100%);
+      font-size: 1rem;
+      padding-top: 0; }
+      section .contents .item .title::before {
+        top: 2px; }
+  .slider {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+    margin-bottom: 2.66%; }
+  .teacherMode .itemMaterial.forTeacher {
+    display: block !important; }
+  .moreBtn a {
+    font-size: 3.73vw;
+    padding: 1em 0; } }
+
+/*clip box */
+.box {
+  margin: auto;
+  padding: 0; }
+
+.box section.movie {
+  padding-bottom: 0; }
+
+.box section.movie > .inner {
+  padding-bottom: 20px; }
+
+.box #mainContents::after, .clip #mainContents::after, .general #mainContents::after {
+  background: none;
+  height: 0; }
+
+#movieChapter.clipDetail .chapterWrap {
+  height: 100%; }
+
+.clipDetail .text {
+  background: #fff; }
+
+.clipDetail .title {
+  margin: 0; }
+
+.clipDetail {
+  background: #f1f1f1; }
+
+.clipDetail .title {
+  background-color: #66af54;
+  color: #fff;
+  font-weight: bold;
+  font-size: 16px; }
+
+.clipDetail .title::before {
+  width: 0;
+  border-style: none;
+  background: none; }
+
+.clipDetail .nerai,
+.clipDetail .naiyo {
+  width: 95.4%;
+  margin: 2.3% auto 2.3%;
+  border-radius: 10px;
+  overflow: hidden; }
+
+.clipDetail .nerai > div,
+.clipDetail .naiyo > div {
+  padding: 3.47% 4.05%; }
+
+@media screen and (max-width: 767px) and (orientation: portrait) {
+  .clipDetail .naiyo {
+    margin-top: 5.33%; }
+  .clipDetail .text {
+    padding: 3.2% 0;
+    font-size: 3.73vw; } }

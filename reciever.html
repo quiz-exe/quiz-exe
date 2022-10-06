@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<!-- saved from url=(0188)file:///C:/Users/%E5%8F%A4%E9%A0%AD%E5%A4%A7%E8%BC%9D/Desktop/%E3%82%AD%E3%83%BC%E3%83%AF%E3%83%BC%E3%83%89%E6%A4%9C%E7%B4%A2%E7%B5%90%E6%9E%9C%20_%20NHK%20for%20School_files/reciever.html -->
+<html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="author" content="NHK">
+<title>NHK for School</title>
+
+<script type="text/javascript" src="./jquery.js(2).ダウンロード"></script>
+<script src="./playlist.js.ダウンロード"></script>
+
+</head>
+<body>
+<script>
+//document.domain = "nhk.or.jp";
+function receiveMessage(e){
+   var data = e.data;
+    var referer = e.origin;
+   school_playlist_control.setLocalList(data,function(success){
+
+   })
+
+}
+window.addEventListener("message",receiveMessage, false);
+
+//親フレームへ
+parent.postMessage(true, '*');
+</script>
+
+
+
+</body></html>
